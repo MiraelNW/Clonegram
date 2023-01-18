@@ -4,7 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/drawable/header.xml" value="0.1" />
-        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/chats_fragment.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/contacts_fragment.xml" value="0.33240740740740743" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/settings_fragment.xml" value="0.30303030303030304" />
       </map>
     </option>
   </component>
