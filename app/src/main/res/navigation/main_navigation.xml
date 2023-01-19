@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/chatsFragment">
+
+    <swipeable
+        android:id="@+id/chatsFragment"
+        android:name="com.example.clonegram.presentation.ChatsFragment"
+        android:label="ChatsFragment" >
+        <action
+            android:id="@+id/action_chatsFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_chatsFragment_to_contactsFragment"
+            app:destination="@id/contactsFragment"
+            app:popUpTo="@id/chatsFragment" />
+    </swipeable>
+
+
+    <swipeable
+        android:id="@+id/contactsFragment"
+        android:name="com.example.clonegram.presentation.ContactsFragment"
+        android:label="ContactsFragment" />
+
+    <swipeable
+        android:id="@+id/settingsFragment"
+        android:name="com.example.clonegram.presentation.SettingsFragment"
+        android:label="SettingsFragment" />
+
+</navigation>

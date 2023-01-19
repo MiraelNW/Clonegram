@@ -6,35 +6,48 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.databinding.SettingsFragmentBinding
+import com.fragula2.utils.findSwipeController
 
 class SettingsFragment : Fragment() {
 
-    private var _binding : SettingsFragmentBinding? = null
-    private val binding : SettingsFragmentBinding
-    get() = _binding ?: throw RuntimeException("SettingsFragmentBinding is null")
+    private var _binding: SettingsFragmentBinding? = null
+    private val binding: SettingsFragmentBinding
+        get() = _binding ?: throw RuntimeException("SettingsFragmentBinding is null")
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = SettingsFragmentBinding.inflate(inflater,container,false)
+        _binding = SettingsFragmentBinding.inflate(inflater, container, false)
 
         return (binding.root)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).addFragment(SettingsFragment())
+        binding.arrowBack.setOnClickListener {
+            findNavController().popBackStack()
+        }
+        binding.settingsBtnChangeBio.setOnClickListener {
+
+        }
+        binding.settingsBtnChangeLogin.setOnClickListener {
+
+        }
+        binding.settingsBtnChangeNumberPhone.setOnClickListener {
+
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding =null
+        _binding = null
     }
 
-    companion object{
-        fun newInstance()=SettingsFragment()
+    companion object {
+
     }
 }
