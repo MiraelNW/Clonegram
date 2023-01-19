@@ -20,7 +20,7 @@
 
     <swipeable
         android:id="@+id/contactsFragment"
-        android:name="com.example.clonegram.presentation.ContactsFragment"
+        android:name="com.example.clonegram.presentation.contacts.ContactsFragment"
         android:label="ContactsFragment" />
 
     <swipeable

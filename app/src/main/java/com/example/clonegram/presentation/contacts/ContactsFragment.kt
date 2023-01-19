@@ -1,5 +1,6 @@
-package com.example.clonegram.presentation
+package com.example.clonegram.presentation.contacts
 
+import android.content.Context
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
@@ -9,13 +10,35 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import com.example.clonegram.ClonegramApp
+import com.example.clonegram.ViewModelFactory
 import com.example.clonegram.databinding.ContactsFragmentBinding
+import com.example.clonegram.domain.models.Contact
+import com.example.clonegram.presentation.contacts.contactAdapter.ContactsAdapter
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ContactsFragment : Fragment() {
+
+    private val component by lazy {
+        (requireActivity().application as ClonegramApp).component
+    }
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    private lateinit var viewModel: ContactViewModel
+
 
     private var _binding: ContactsFragmentBinding? = null
     private val binding: ContactsFragmentBinding
         get() = _binding ?: throw RuntimeException("ContactsFragmentBinding is null")
+
+    override fun onAttach(context: Context) {
+        component.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,6 +53,15 @@ class ContactsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         startLocationPermissionRequest()
 
+        viewModel = ViewModelProvider(this,viewModelFactory)[ContactViewModel::class.java]
+
+        val adapter = ContactsAdapter()
+        binding.contactsRecyclerView.adapter = adapter
+        viewModel.contactList().observe(viewLifecycleOwner){
+            adapter.submitList(it)
+        }
+
+
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -39,6 +71,7 @@ class ContactsFragment : Fragment() {
             requestContacts()
         } else {
             Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
+            requireActivity().finish()
         }
     }
 
@@ -59,7 +92,6 @@ class ContactsFragment : Fragment() {
             val name =
                 cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
             val id = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
-            Log.d("contact", "$id $name")
 
             val phoneCursor = requireActivity().contentResolver.query(
                 ContactsContract.CommonDataKinds
@@ -68,20 +100,28 @@ class ContactsFragment : Fragment() {
                 ContactsContract.CommonDataKinds
                     .Phone.CONTACT_ID + " = ?",
                 arrayOf(id),
-                null)
+                null
+            )
             while (phoneCursor?.moveToNext() == true) {
                 val phone = phoneCursor.getString(
                     phoneCursor.getColumnIndexOrThrow(
                         ContactsContract.CommonDataKinds.Phone.NUMBER
                     )
                 )
-                Log.d("contact", " $phone")
+                val contact = Contact(id, name, phone)
+                lifecycleScope.launch {
+                    viewModel.insertContact.invoke(contact)
+                }
+                Log.d("contact", contact.toString())
             }
             phoneCursor?.close()
         }
         cursor?.close()
+    }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
