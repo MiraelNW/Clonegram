@@ -4,7 +4,7 @@ import android.app.Application
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.presentation.ChatsFragment
 import com.example.clonegram.presentation.MainActivity
-import com.example.clonegram.presentation.SettingsFragment
+import com.example.clonegram.presentation.settings.SettingsFragment
 import com.example.clonegram.presentation.contacts.ContactsFragment
 import dagger.BindsInstance
 import dagger.Component

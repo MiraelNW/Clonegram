@@ -11,4 +11,5 @@ val insertContact: InsertContactUseCase
 ) : ViewModel() {
 
 
+
 }

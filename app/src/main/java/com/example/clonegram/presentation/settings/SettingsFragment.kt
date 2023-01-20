@@ -1,4 +1,4 @@
-package com.example.clonegram.presentation
+package com.example.clonegram.presentation.settings
 
 import android.content.Context
 import android.os.Bundle
@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
+import com.example.clonegram.R
 import com.example.clonegram.databinding.SettingsFragmentBinding
 import com.fragula2.utils.findSwipeController
 
@@ -43,7 +44,7 @@ class SettingsFragment : Fragment() {
             findNavController().popBackStack()
         }
         binding.settingsBtnChangeBio.setOnClickListener {
-
+            findNavController().navigate(R.id.action_settingsFragment_to_changeBioFragment)
         }
         binding.settingsBtnChangeLogin.setOnClickListener {
 

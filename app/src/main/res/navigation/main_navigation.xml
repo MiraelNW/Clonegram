@@ -25,7 +25,17 @@
 
     <swipeable
         android:id="@+id/settingsFragment"
-        android:name="com.example.clonegram.presentation.SettingsFragment"
-        android:label="SettingsFragment" />
+        android:name="com.example.clonegram.presentation.settings.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_changeBioFragment"
+            app:destination="@id/changeBioFragment"
+            app:popUpTo="@id/settingsFragment" />
+    </swipeable>
+
+    <swipeable
+        android:id="@+id/changeBioFragment"
+        android:name="com.example.clonegram.presentation.settings.ChangeBioFragment"
+        android:label="ChangeBioFragment" />
 
 </navigation>
