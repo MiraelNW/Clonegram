@@ -1,5 +1,6 @@
-package com.example.clonegram.presentation
+package com.example.clonegram.presentation.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,14 +8,25 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.clonegram.ClonegramApp
+import com.example.clonegram.R
 import com.example.clonegram.databinding.SettingsFragmentBinding
 import com.fragula2.utils.findSwipeController
 
 class SettingsFragment : Fragment() {
 
+    private val component by lazy {
+        (requireActivity().application as ClonegramApp).component
+    }
+
     private var _binding: SettingsFragmentBinding? = null
     private val binding: SettingsFragmentBinding
         get() = _binding ?: throw RuntimeException("SettingsFragmentBinding is null")
+
+    override fun onAttach(context: Context) {
+        component.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,7 +44,7 @@ class SettingsFragment : Fragment() {
             findNavController().popBackStack()
         }
         binding.settingsBtnChangeBio.setOnClickListener {
-
+            findNavController().navigate(R.id.action_settingsFragment_to_changeBioFragment)
         }
         binding.settingsBtnChangeLogin.setOnClickListener {
 

@@ -1,11 +1,13 @@
 package com.example.clonegram.presentation
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.ChatsFragmentBinding
 import com.mikepenz.materialdrawer.AccountHeader
@@ -19,12 +21,21 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 
 class ChatsFragment : Fragment() {
 
+    private val component by lazy {
+        (requireActivity().application as ClonegramApp).component
+    }
+
     private lateinit var drawer: Drawer
     private lateinit var header: AccountHeader
 
     private var _binding: ChatsFragmentBinding? = null
     private val binding: ChatsFragmentBinding
         get() = _binding ?: throw RuntimeException("ChatsFragmentBinding is null")
+
+    override fun onAttach(context: Context) {
+        component.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -127,6 +138,11 @@ class ChatsFragment : Fragment() {
             })
             .withAccountHeader(header)
             .build()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
