@@ -6,19 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
-import com.example.clonegram.databinding.ChangeBioFragmentBinding
+import com.example.clonegram.databinding.ChangeNameFragmentBinding
 
-class ChangeBioFragment : Fragment() {
+class ChangeNameFragment : Fragment() {
 
     private val component by lazy {
         (requireActivity().application as ClonegramApp).component
     }
 
-    private var _binding : ChangeBioFragmentBinding? = null
-    private val binding : ChangeBioFragmentBinding
-    get() = _binding ?: throw RuntimeException("ChangeBioFragmentBinding is null")
+    private var _binding: ChangeNameFragmentBinding? = null
+    private val binding: ChangeNameFragmentBinding
+        get() = _binding ?: throw RuntimeException("ChangeNameFragmentBinding is null")
 
     override fun onAttach(context: Context) {
         component.inject(this)
@@ -30,19 +29,19 @@ class ChangeBioFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = ChangeBioFragmentBinding.inflate(inflater,container,false)
-        return(binding.root)
+        _binding = ChangeNameFragmentBinding.inflate(inflater, container, false)
+        return (binding.root)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.arrowBack.setOnClickListener {
-            findNavController().popBackStack()
-
-        }
         binding.accept.setOnClickListener {
-            findNavController().popBackStack()
+            //ToDo
         }
+        binding.arrowBack.setOnClickListener {
+            requireActivity().supportFragmentManager.popBackStack()
+        }
+
     }
 
     override fun onDestroyView() {
@@ -50,9 +49,8 @@ class ChangeBioFragment : Fragment() {
         _binding = null
     }
 
-    companion object{
-        fun newInstance() = ChangeBioFragment()
+    companion object {
+        fun newInstance() = ChangeNameFragment()
     }
-
 
 }

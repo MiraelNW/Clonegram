@@ -2,16 +2,12 @@ package com.example.clonegram.presentation.settings
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.SettingsFragmentBinding
-import com.fragula2.utils.findSwipeController
+import com.example.clonegram.utils.AUTH
 
 class SettingsFragment : Fragment() {
 
@@ -34,25 +30,44 @@ class SettingsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = SettingsFragmentBinding.inflate(inflater, container, false)
-
         return (binding.root)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding.arrowBack.setOnClickListener {
-            findNavController().popBackStack()
+            requireActivity().supportFragmentManager.popBackStack()
         }
         binding.settingsBtnChangeBio.setOnClickListener {
-            findNavController().navigate(R.id.action_settingsFragment_to_changeBioFragment)
+           startFragment(ChangeBioFragment.newInstance())
         }
         binding.settingsBtnChangeLogin.setOnClickListener {
+            startFragment(ChangeUserIdFragment.newInstance())
 
         }
         binding.settingsBtnChangeNumberPhone.setOnClickListener {
-
+            //TODO
+        }
+        binding.changeName.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.container,ChangeNameFragment.newInstance())
+                .addToBackStack(null)
+                .commit()
+        }
+        binding.exit.setOnClickListener {
+            AUTH.signOut()
+            requireActivity().finish()
         }
     }
+
+    private fun startFragment(fragment : Fragment){
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.container,fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -60,6 +75,6 @@ class SettingsFragment : Fragment() {
     }
 
     companion object {
-
+        fun newInstance() = SettingsFragment()
     }
 }

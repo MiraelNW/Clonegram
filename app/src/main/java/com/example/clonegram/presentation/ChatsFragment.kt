@@ -2,14 +2,22 @@ package com.example.clonegram.presentation
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.ChatsFragmentBinding
+import com.example.clonegram.presentation.authication.StartCommunicationFragment
+import com.example.clonegram.presentation.contacts.ContactsFragment
+import com.example.clonegram.presentation.settings.SettingsFragment
+import com.example.clonegram.utils.AUTH
+import com.google.firebase.auth.FirebaseAuth
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -50,6 +58,7 @@ class ChatsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -126,18 +135,24 @@ class ChatsFragment : Fragment() {
                 ): Boolean {
                     when (drawerItem.identifier.toInt()) {
                         105 -> {
-                            findNavController().navigate(R.id.action_chatsFragment_to_settingsFragment)
+                            startFragment(SettingsFragment.newInstance())
                         }
                         101 -> {
-                            findNavController().navigate(R.id.action_chatsFragment_to_contactsFragment)
+                            startFragment(ContactsFragment.newInstance())
                         }
                     }
                     return false
                 }
-
             })
             .withAccountHeader(header)
             .build()
+    }
+
+    private fun startFragment(fragment : Fragment){
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.container,fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onDestroyView() {
@@ -146,6 +161,6 @@ class ChatsFragment : Fragment() {
     }
 
     companion object {
-
+        fun newInstance() = ChatsFragment()
     }
 }

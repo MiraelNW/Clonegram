@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id("androidx.navigation.safeargs.kotlin")
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
 
 }
 
@@ -32,7 +33,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding true
     }
 }
@@ -54,8 +55,9 @@ dependencies {
     implementation "androidx.annotation:annotation:1.5.0"
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-
     implementation 'com.fragula2:fragula-core:2.4.1'
+    implementation 'com.github.KevinSchildhorn:OTPView:0.2.5'
+    implementation 'com.github.santalu:maskara:1.0.0'
 
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
@@ -69,4 +71,9 @@ dependencies {
     kapt 'com.google.dagger:dagger-compiler:2.35.1'
 
     implementation 'com.squareup.picasso:picasso:2.8'
+
+    implementation platform('com.google.firebase:firebase-bom:31.1.1')
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'androidx.browser:browser:1.2.0'
+
 }

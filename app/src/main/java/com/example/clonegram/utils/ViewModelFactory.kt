@@ -1,4 +1,4 @@
-package com.example.clonegram
+package com.example.clonegram.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
