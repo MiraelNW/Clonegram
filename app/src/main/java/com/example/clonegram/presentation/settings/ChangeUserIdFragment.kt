@@ -6,19 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
-import com.example.clonegram.databinding.ChangeBioFragmentBinding
+import com.example.clonegram.databinding.ChangeUserIdFragmentBinding
 
-class ChangeBioFragment : Fragment() {
+class ChangeUserIdFragment :Fragment(){
 
     private val component by lazy {
         (requireActivity().application as ClonegramApp).component
     }
 
-    private var _binding : ChangeBioFragmentBinding? = null
-    private val binding : ChangeBioFragmentBinding
-    get() = _binding ?: throw RuntimeException("ChangeBioFragmentBinding is null")
+    private var _binding : ChangeUserIdFragmentBinding? = null
+    private val binding : ChangeUserIdFragmentBinding
+        get() = _binding ?: throw RuntimeException("ChangeUserIdFragmentBinding is null")
 
     override fun onAttach(context: Context) {
         component.inject(this)
@@ -30,18 +29,18 @@ class ChangeBioFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = ChangeBioFragmentBinding.inflate(inflater,container,false)
+        _binding = ChangeUserIdFragmentBinding.inflate(inflater,container,false)
         return(binding.root)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.arrowBack.setOnClickListener {
-            findNavController().popBackStack()
+            requireActivity().supportFragmentManager.popBackStack()
 
         }
         binding.accept.setOnClickListener {
-            findNavController().popBackStack()
+            requireActivity().supportFragmentManager.popBackStack()
         }
     }
 
@@ -51,8 +50,7 @@ class ChangeBioFragment : Fragment() {
     }
 
     companion object{
-        fun newInstance() = ChangeBioFragment()
+        fun newInstance() = ChangeUserIdFragment()
     }
-
 
 }

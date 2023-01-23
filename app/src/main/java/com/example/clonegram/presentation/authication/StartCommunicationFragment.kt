@@ -1,4 +1,4 @@
-package com.example.clonegram.presentation.settings
+package com.example.clonegram.presentation.authication
 
 import android.content.Context
 import android.os.Bundle
@@ -6,19 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
-import com.example.clonegram.databinding.ChangeBioFragmentBinding
+import com.example.clonegram.R
+import com.example.clonegram.databinding.StartCommunicationFragmentBinding
 
-class ChangeBioFragment : Fragment() {
+class StartCommunicationFragment : Fragment() {
 
     private val component by lazy {
         (requireActivity().application as ClonegramApp).component
     }
 
-    private var _binding : ChangeBioFragmentBinding? = null
-    private val binding : ChangeBioFragmentBinding
-    get() = _binding ?: throw RuntimeException("ChangeBioFragmentBinding is null")
+    private var _binding : StartCommunicationFragmentBinding? = null
+    private val binding : StartCommunicationFragmentBinding
+    get() = _binding ?: throw RuntimeException("StartCommunicationFragmentBinding is null")
 
     override fun onAttach(context: Context) {
         component.inject(this)
@@ -30,18 +30,16 @@ class ChangeBioFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = ChangeBioFragmentBinding.inflate(inflater,container,false)
-        return(binding.root)
+        _binding = StartCommunicationFragmentBinding.inflate(inflater,container,false)
+        return (binding.root)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.arrowBack.setOnClickListener {
-            findNavController().popBackStack()
-
-        }
-        binding.accept.setOnClickListener {
-            findNavController().popBackStack()
+        binding.startCommunication.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.container, EnterPhoneNumberFragment.newInstance())
+                .commit()
         }
     }
 
@@ -51,8 +49,7 @@ class ChangeBioFragment : Fragment() {
     }
 
     companion object{
-        fun newInstance() = ChangeBioFragment()
+        fun newInstance() = StartCommunicationFragment()
     }
-
 
 }

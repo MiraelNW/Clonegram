@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/white"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/settings_header_bloc"
@@ -21,8 +21,8 @@
             android:id="@+id/arrow_back"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:foregroundGravity="center"
             android:layout_marginStart="16dp"
+            android:foregroundGravity="center"
             android:src="@drawable/ic_arrow_back"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -68,6 +68,30 @@
             app:layout_constraintHorizontal_bias="0.023"
             app:layout_constraintStart_toEndOf="@id/settings_user_photo"
             app:layout_constraintTop_toBottomOf="@id/settings_username" />
+
+        <ImageView
+            android:id="@+id/change_name"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="28dp"
+            android:foregroundGravity="center"
+            android:src="@drawable/ic_btn_change_name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/settings_username"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.444" />
+
+        <ImageView
+            android:id="@+id/exit"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="20dp"
+            android:foregroundGravity="center"
+            android:src="@drawable/exit"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/change_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.444" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -134,88 +158,88 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/settings_btn_change_number_phone">
 
-    <TextView
-        android:id="@+id/settings_login"
+        <TextView
+            android:id="@+id/settings_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/settings_default_login"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/settings_btn_change_login" />
+
+        <TextView
+            android:id="@+id/settings_label_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/settings_label_login"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settings_login" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="@dimen/horizontal_margin"
+            android:layout_marginTop="@dimen/vertical_margin"
+            android:background="@color/colorGrey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settings_label_login" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/settings_btn_change_bio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:text="@string/settings_default_login"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/settings_btn_change_login" />
-
-    <TextView
-        android:id="@+id/settings_label_login"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:text="@string/settings_label_login"
-        android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settings_login" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginStart="@dimen/horizontal_margin"
-        android:layout_marginTop="@dimen/vertical_margin"
-        android:background="@color/colorGrey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/settings_label_login" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        app:layout_constraintTop_toBottomOf="@id/settings_btn_change_login">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-android:id="@+id/settings_btn_change_bio"
-android:layout_height="wrap_content"
-android:layout_width="match_parent"
-android:textColor="@color/black"
-app:layout_constraintEnd_toEndOf="parent"
-app:layout_constraintStart_toStartOf="parent"
-app:layout_constraintTop_toBottomOf="@id/settings_btn_change_login">
+        <TextView
+            android:id="@+id/settings_bio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/settings_default_bio"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/settings_btn_change_bio" />
 
-<TextView
-    android:id="@+id/settings_bio"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="12dp"
-    android:layout_width="match_parent"
-    android:text="@string/settings_default_bio"
-    android:textColor="@color/black"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="@id/settings_btn_change_bio" />
+        <TextView
+            android:id="@+id/settings_label_bio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/settings_label_bio"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settings_bio" />
 
-<TextView
-    android:id="@+id/settings_label_bio"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="12dp"
-    android:layout_width="match_parent"
-    android:text="@string/settings_label_bio"
-    android:textColor="@color/black"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/settings_bio" />
-
-<View
-    android:layout_width="match_parent"
-    android:layout_height="1dp"
-    android:layout_marginStart="@dimen/horizontal_margin"
-    android:layout_marginTop="@dimen/vertical_margin"
-    android:background="@color/colorGrey"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/settings_label_bio" />
-</androidx.constraintlayout.widget.ConstraintLayout>
-
-<de.hdodenhof.circleimageview.CircleImageView
-android:id="@+id/settings_change_photo"
-android:layout_height="@dimen/settings_user_photo_height"
-android:layout_marginEnd="@dimen/horizontal_margin"
-android:layout_width="@dimen/settings_user_photo_width"
-android:src="@drawable/ic_camera"
-    android:elevation="16dp"
-app:civ_border_color="@color/colorGrey"
-app:civ_circle_background_color="@color/colorAccent"
-app:layout_constraintBottom_toBottomOf="@+id/settings_header_bloc"
-app:layout_constraintEnd_toEndOf="parent"
-app:layout_constraintTop_toBottomOf="@+id/settings_header_bloc" />
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="@dimen/horizontal_margin"
+            android:layout_marginTop="@dimen/vertical_margin"
+            android:background="@color/colorGrey"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/settings_label_bio" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/settings_change_photo"
+        android:layout_width="@dimen/settings_user_photo_width"
+        android:layout_height="@dimen/settings_user_photo_height"
+        android:layout_marginEnd="16dp"
+        android:elevation="16dp"
+        android:src="@drawable/ic_camera"
+        app:civ_border_color="@color/colorGrey"
+        app:civ_circle_background_color="@color/colorAccent"
+        app:layout_constraintBottom_toBottomOf="@+id/settings_header_bloc"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_header_bloc" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,12 +1,12 @@
-package com.example.clonegram.presentation.contacts
+package com.example.clonegram.presentation
 
 import androidx.lifecycle.ViewModel
 import com.example.clonegram.domain.usecases.GetContactListUseCase
 import com.example.clonegram.domain.usecases.InsertContactUseCase
 import javax.inject.Inject
 
-class ContactViewModel @Inject constructor(
-val contactList : GetContactListUseCase
+class MainViewModel @Inject constructor(
+val insertContact: InsertContactUseCase
 ) : ViewModel() {
 
 
