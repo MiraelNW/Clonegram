@@ -12,7 +12,7 @@ import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.EnterCodeFragmentBinding
 import com.example.clonegram.presentation.ChatsFragment
-import com.example.clonegram.utils.AUTH
+import com.example.clonegram.utils.*
 import com.google.firebase.auth.PhoneAuthProvider
 
 
@@ -53,9 +53,20 @@ class EnterCodeFragment : Fragment() {
             Log.d("tag", code)
             AUTH.signInWithCredential(credential).addOnCompleteListener {
                 if (it.isSuccessful) {
-                    Log.d("tag", "start")
-                    makeToast("Welcome to the Clonegram")
-                    startChatFragment()
+                    val uid = AUTH.currentUser?.uid.toString()
+                    val dateMap = mutableMapOf<String, Any>()
+                    dateMap[CHILD_ID] = uid
+                    dateMap[PHONE_NUMBER] = phoneNumber
+                    dateMap[CHILD_USERNAME] = uid
+                    REF_DATABASE_ROOT.child(NODE_USERS).child(uid).updateChildren(dateMap)
+                        .addOnCompleteListener { task->
+                            if(task.isSuccessful){
+                                makeToast("Welcome to the Clonegram")
+                                startChatFragment()
+                            }else{
+                                makeToast(task.exception?.message.toString())
+                            }
+                        }
                 } else {
                     makeToast(it.exception?.message ?: "")
                 }
@@ -89,7 +100,6 @@ class EnterCodeFragment : Fragment() {
     }
 
     companion object {
-        private const val KEY_VERIFICATION_ID = "key_verification_id"
         private const val PHONE_NUMBER = "phone_number"
         private const val ID = "id"
         fun newInstance(phoneNumber: String, id: String): EnterCodeFragment {

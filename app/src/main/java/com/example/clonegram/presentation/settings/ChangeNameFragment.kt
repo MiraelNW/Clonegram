@@ -42,6 +42,7 @@ class ChangeNameFragment : Fragment() {
             requireActivity().supportFragmentManager.popBackStack()
         }
 
+
     }
 
     override fun onDestroyView() {
