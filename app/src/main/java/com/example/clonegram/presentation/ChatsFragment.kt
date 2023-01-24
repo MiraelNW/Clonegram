@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.*
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
@@ -35,6 +36,7 @@ class ChatsFragment : Fragment() {
 
     private lateinit var drawer: Drawer
     private lateinit var header: AccountHeader
+    private lateinit var drawerLayout: DrawerLayout
 
     private var _binding: ChatsFragmentBinding? = null
     private val binding: ChatsFragmentBinding
@@ -64,6 +66,7 @@ class ChatsFragment : Fragment() {
         super.onResume()
         createHeader()
         createDrawer()
+        drawerLayout = drawer.drawerLayout
     }
 
     private fun createHeader() {
@@ -148,7 +151,12 @@ class ChatsFragment : Fragment() {
             .build()
     }
 
+    private fun disableDrawer(){
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+    }
+
     private fun startFragment(fragment : Fragment){
+        disableDrawer()
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.container,fragment)
             .addToBackStack(null)

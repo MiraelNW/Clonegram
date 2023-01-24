@@ -19,6 +19,7 @@ import com.example.clonegram.databinding.ActivityMainBinding
 import com.example.clonegram.domain.models.Contact
 import com.example.clonegram.presentation.authication.StartCommunicationFragment
 import com.example.clonegram.utils.AUTH
+import com.example.clonegram.utils.initFirebaseDatabase
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,9 +43,9 @@ class MainActivity : AppCompatActivity() {
         component.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        initFirebaseDatabase()
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         startLocationPermissionRequest()
-        AUTH = FirebaseAuth.getInstance()
         if (AUTH.currentUser == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.container, StartCommunicationFragment.newInstance())
