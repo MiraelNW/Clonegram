@@ -3,26 +3,23 @@ package com.example.clonegram.presentation
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
-import android.view.Menu
-import android.view.MenuInflater
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
-import com.example.clonegram.utils.ViewModelFactory
 import com.example.clonegram.databinding.ActivityMainBinding
 import com.example.clonegram.domain.models.Contact
 import com.example.clonegram.presentation.authication.StartCommunicationFragment
-import com.example.clonegram.utils.AUTH
-import com.example.clonegram.utils.initFirebaseDatabase
-import com.google.firebase.auth.FirebaseAuth
+import com.example.clonegram.utils.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.clonegram.domain.models.UserInfo
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initFirebaseDatabase()
+        initUser()
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         startLocationPermissionRequest()
         if (AUTH.currentUser == null) {
@@ -55,6 +53,18 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container,ChatsFragment.newInstance())
                 .commit()
         }
+    }
+
+    private fun initUser(){
+        REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    USER = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
     }
 
     private val requestPermissionLauncher = registerForActivityResult(

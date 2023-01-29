@@ -81,21 +81,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <EditText
-                android:id="@+id/et_change_last_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Last name(unnecessarily)"
-                android:textColor="@color/black"
-                android:inputType="text"
-                android:textColorHint="#E8858584"
-                android:backgroundTint="@color/colorPrimary"
-                android:textCursorDrawable="@drawable/drawable_cursor"
-                android:cursorVisible="true"
-                app:layout_constraintEnd_toEndOf="parent"
 
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/et_change_name" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
