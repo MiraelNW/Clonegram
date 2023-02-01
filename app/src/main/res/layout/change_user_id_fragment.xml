@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
-        android:elevation="8dp"
+        android:elevation="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,30 +65,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/about_yourself_header_bloc">
 
+        <TextView
+            android:id="@+id/cl.me"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="cl.me/"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/textView2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <EditText
             android:id="@+id/et_user_id"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
             android:backgroundTint="@color/colorPrimary"
             android:cursorVisible="true"
             android:hint="User id"
             android:inputType="text"
+            android:layout_marginStart="-4dp"
             android:textColor="@color/black"
             android:textColorHint="#E8858584"
             android:textCursorDrawable="@drawable/drawable_cursor"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cl.me"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="
-Other people will be able to find you by this id and contact you without knowing your phone number."
+            android:text="Other people will be able to find you by this id and contact you without knowing your phone number."
             android:textColor="#515151"
             android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
 
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/et_user_id" />
 

@@ -52,15 +52,11 @@ class EnterPhoneNumberFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val phoneNumber = binding.inputPhoneNumber
-
         binding.registerBtnNext.setOnClickListener {
             if (phoneNumber.isDone) {
                 callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     override fun onVerificationCompleted(credential: PhoneAuthCredential) {
                         AUTH.signInWithCredential(credential).addOnCompleteListener {
-                            if (it.isSuccessful) {
-
-                            }
                         }
                     }
 
@@ -71,9 +67,7 @@ class EnterPhoneNumberFragment : Fragment() {
 
                     override fun onCodeSent(id: String, p1: PhoneAuthProvider.ForceResendingToken) {
                         super.onCodeSent(id, p1)
-
                         startEnterCodeFragment(phoneNumber.masked, id)
-
                     }
                 }
                 authUser(phoneNumber.masked)
