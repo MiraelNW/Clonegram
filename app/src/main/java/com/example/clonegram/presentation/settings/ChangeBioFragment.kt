@@ -42,13 +42,14 @@ class ChangeBioFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.etAboutYourself.setText(USER.bio)
         changeBio()
         binding.arrowBack.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
 
         }
         binding.accept.setOnClickListener {
-            changeBio()
+            saveBio()
         }
     }
 
@@ -59,8 +60,17 @@ class ChangeBioFragment : Fragment() {
 
     private fun changeBio() {
         val bio = binding.etAboutYourself.text.toString().trim()
+        if (bio == DEFAULT_BIO) {
+            with(binding.etAboutYourself) {
+                setText("")
+                hint = DEFAULT_BIO
+            }
+        }
         binding.etAboutYourself.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            override fun beforeTextChanged(str: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                Log.d("tag","beforetext")
+                val length = str?.length ?: 0
+                binding.countSymbols.text = (MAX_LENGTH - length).toString()
             }
 
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -72,20 +82,29 @@ class ChangeBioFragment : Fragment() {
             }
 
         })
-        if(bio.isNotEmpty()) {
+
+    }
+
+    private fun saveBio() {
+        val bio = binding.etAboutYourself.text.toString().trim()
+        if (bio.isNotEmpty()) {
             REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_BIO).setValue(bio)
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
-                        Toast.makeText(requireContext(), "Your bio is saved", Toast.LENGTH_SHORT)
-                            .show()
+                        showToast("Your bio is saved")
+                        USER.bio = bio
                         requireActivity().supportFragmentManager.popBackStack()
                     }
                 }
+        } else {
+            USER.bio = DEFAULT_BIO
+            requireActivity().supportFragmentManager.popBackStack()
         }
     }
 
     companion object {
         private const val MAX_LENGTH = 70
+        private const val DEFAULT_BIO = "About yourself"
         fun newInstance() = ChangeBioFragment()
     }
 

@@ -41,25 +41,28 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         initFirebaseDatabase()
-        initUser()
+
         viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         startLocationPermissionRequest()
         if (AUTH.currentUser == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.container, StartCommunicationFragment.newInstance())
                 .commit()
-        }else{
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container,ChatsFragment.newInstance())
-                .commit()
+        } else {
+            initUser(){
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, ChatsFragment.newInstance())
+                    .commit()
+            }
         }
     }
 
-    private fun initUser(){
+    private fun initUser(function: () -> Unit) {
         REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     USER = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
+                    function()
                 }
 
                 override fun onCancelled(error: DatabaseError) {

@@ -1,15 +1,21 @@
 package com.example.clonegram.presentation.settings
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.SettingsFragmentBinding
-import com.example.clonegram.utils.AUTH
-import com.example.clonegram.utils.UID
-import com.example.clonegram.utils.USER
+import com.example.clonegram.presentation.MainActivity
+import com.example.clonegram.utils.*
+import com.google.firebase.storage.StorageReference
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 
 class SettingsFragment : Fragment() {
 
@@ -37,7 +43,6 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initFields()
 
         binding.arrowBack.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
@@ -52,7 +57,7 @@ class SettingsFragment : Fragment() {
             //TODO
         }
         binding.settingsChangePhoto.setOnClickListener {
-
+            changeUserPhoto()
         }
         binding.changeName.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
@@ -66,13 +71,67 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        initFields()
+    }
+
     private fun initFields() {
         with(binding) {
             settingsUsername.text = USER.name
             settingsPhoneNumber.text = USER.phone
             settingsLogin.text = USER.id
             settingsBio.text = USER.bio
+            settingsUserPhoto.downloadAndSetImage(USER.photoUrl)
         }
+    }
+
+    private fun changeUserPhoto() {
+        CropImage.activity()
+            .setAspectRatio(1,1)
+            .setCropShape(CropImageView.CropShape.OVAL)
+            .setRequestedSize(300,300)
+            .start(requireActivity(),this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE
+            && resultCode == RESULT_OK && data != null
+        ) {
+            val uri = CropImage.getActivityResult(data).uri
+            val path = REF_STORAGE_ROOT.child(FOLDER_PROFILE_IMAGE)
+                .child(UID)
+            putImageToStorage(uri,path){
+                getUrlFromStorage(path){
+                    putUrlToDatabase(it){
+                        USER.photoUrl = it
+                            binding.settingsUserPhoto.downloadAndSetImage(it)
+                        showToast("Your photo is saved")
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun putUrlToDatabase(url: String, function: () -> Unit) {
+        REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
+            .child(CHILD_PHOTO).setValue(url)
+            .addOnSuccessListener { function() }
+            .addOnFailureListener { showToast(it.message.toString()) }
+    }
+
+    private fun getUrlFromStorage(path: StorageReference, function: (url : String) -> Unit) {
+        path.downloadUrl
+            .addOnSuccessListener { function(it.toString()) }
+            .addOnFailureListener { showToast(it.message.toString()) }
+    }
+
+    private fun putImageToStorage(uri: Uri, path: StorageReference, function: () -> Unit) {
+        path.putFile(uri)
+            .addOnSuccessListener { function() }
+            .addOnFailureListener { showToast(it.message.toString()) }
     }
 
     private fun startFragment(fragment: Fragment) {
@@ -81,7 +140,6 @@ class SettingsFragment : Fragment() {
             .addToBackStack(null)
             .commit()
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

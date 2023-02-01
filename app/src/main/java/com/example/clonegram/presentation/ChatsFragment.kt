@@ -1,9 +1,12 @@
 package com.example.clonegram.presentation
 
 import android.content.Context
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.ImageView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.drawerlayout.widget.DrawerLayout
@@ -18,6 +21,8 @@ import com.example.clonegram.presentation.authication.StartCommunicationFragment
 import com.example.clonegram.presentation.contacts.ContactsFragment
 import com.example.clonegram.presentation.settings.SettingsFragment
 import com.example.clonegram.utils.AUTH
+import com.example.clonegram.utils.USER
+import com.example.clonegram.utils.downloadAndSetImage
 import com.google.firebase.auth.FirebaseAuth
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -27,6 +32,8 @@ import com.mikepenz.materialdrawer.model.DividerDrawerItem
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
+import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader
+import com.mikepenz.materialdrawer.util.DrawerImageLoader
 
 class ChatsFragment : Fragment() {
 
@@ -61,22 +68,29 @@ class ChatsFragment : Fragment() {
 
     }
 
-
     override fun onResume() {
         super.onResume()
+        createMenu()
+    }
+
+    private fun createMenu(){
+        initLoader()
         createHeader()
         createDrawer()
         drawerLayout = drawer.drawerLayout
     }
 
     private fun createHeader() {
+        val profileItem = ProfileDrawerItem()
+            .withName(USER.name)
+            .withEmail(USER.phone)
+            .withIcon(USER.photoUrl)
+            .withIdentifier(200)
         header = AccountHeaderBuilder()
             .withActivity(requireActivity())
             .withHeaderBackground(R.drawable.header)
             .addProfiles(
-                ProfileDrawerItem()
-                    .withName("Buhstoevcky")
-                    .withEmail("+79137974695")
+                profileItem
             )
             .build()
     }
@@ -90,45 +104,45 @@ class ChatsFragment : Fragment() {
             .addDrawerItems(
                 PrimaryDrawerItem()
                     .withIconTintingEnabled(true)
-                    .withIdentifier(100)
+                    .withIdentifier(IDENTIFIER_CREATE_GROUP)
                     .withIcon(R.drawable.ic_menu_create_groups)
-                    .withName("Создать группу"),
+                    .withName(CREATE_GROUP),
                 PrimaryDrawerItem()
                     .withIconTintingEnabled(true)
-                    .withIdentifier(101)
+                    .withIdentifier(IDENTIFIER_CONTACTS)
                     .withIcon(R.drawable.ic_menu_contacts)
-                    .withName("Контакты"),
+                    .withName(CONTACTS),
                 PrimaryDrawerItem()
                     .withIconTintingEnabled(true)
-                    .withIdentifier(102)
+                    .withIdentifier(IDENTIFIER_CALLINGS)
                     .withIcon(R.drawable.ic_menu_phone)
-                    .withName("Звонки"),
+                    .withName(CALLINGS),
                 PrimaryDrawerItem()
                     .withIconTintingEnabled(true)
-                    .withIdentifier(103)
+                    .withIdentifier(IDENTIFIER_PEOPLE_NEARBY)
                     .withIcon(R.drawable.ic_menu_create_channel)
-                    .withName("Люди рядом"),
+                    .withName(PEOPLE_NEARBY),
                 PrimaryDrawerItem()
                     .withIconTintingEnabled(true)
-                    .withIdentifier(104)
+                    .withIdentifier(IDENTIFIER_FAVOURITES)
                     .withIcon(R.drawable.ic_menu_favorites)
-                    .withName("Избранное"),
+                    .withName(FAVOURITES),
                 PrimaryDrawerItem()
                     .withIconTintingEnabled(true)
-                    .withIdentifier(105)
+                    .withIdentifier(IDENTIFIER_SETTINGS)
                     .withIcon(R.drawable.ic_menu_settings)
-                    .withName("Настройки"),
+                    .withName(SETTINGS),
                 DividerDrawerItem(),
                 PrimaryDrawerItem()
                     .withIconTintingEnabled(true)
-                    .withIdentifier(106)
+                    .withIdentifier(IDENTIFIER_INVITE_FRIENDS)
                     .withIcon(R.drawable.ic_menu_invate)
-                    .withName("Пригласить друзей"),
+                    .withName(INVITE_FRIENDS),
                 PrimaryDrawerItem()
                     .withIconTintingEnabled(true)
-                    .withIdentifier(107)
+                    .withIdentifier(IDENTIFIER_CLONEGRAM_OPPORTUNITIES)
                     .withIcon(R.drawable.ic_menu_help)
-                    .withName("Возможности Clonegram")
+                    .withName(CLONEGRAM_OPPORTUNITIES)
             )
             .withOnDrawerItemClickListener(object : Drawer.OnDrawerItemClickListener {
                 override fun onItemClick(
@@ -151,6 +165,14 @@ class ChatsFragment : Fragment() {
             .build()
     }
 
+    private fun initLoader(){
+        DrawerImageLoader.init(object : AbstractDrawerImageLoader(){
+            override fun set(imageView: ImageView, uri: Uri, placeholder: Drawable) {
+                imageView.downloadAndSetImage(uri.toString())
+            }
+        })
+    }
+
     private fun disableDrawer(){
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
@@ -170,5 +192,30 @@ class ChatsFragment : Fragment() {
 
     companion object {
         fun newInstance() = ChatsFragment()
+
+        private const val IDENTIFIER_CREATE_GROUP = 100L
+        private const val CREATE_GROUP = "Создать группу"
+
+        private const val IDENTIFIER_CONTACTS = 101L
+        private const val CONTACTS = "Контакты"
+
+        private const val IDENTIFIER_CALLINGS = 102L
+        private const val CALLINGS = "Звонки"
+
+        private const val IDENTIFIER_PEOPLE_NEARBY = 103L
+        private const val PEOPLE_NEARBY = "Люди рядом"
+
+        private const val IDENTIFIER_FAVOURITES = 104L
+        private const val FAVOURITES = "Избранное"
+
+        private const val IDENTIFIER_SETTINGS = 105L
+        private const val SETTINGS = "Настройки"
+
+        private const val IDENTIFIER_INVITE_FRIENDS = 106L
+        private const val INVITE_FRIENDS = "Пригласить друзей"
+
+        private const val IDENTIFIER_CLONEGRAM_OPPORTUNITIES = 107L
+        private const val CLONEGRAM_OPPORTUNITIES = "Возможности Clonegram"
+
     }
 }

@@ -83,20 +83,13 @@ class ChangeUserIdFragment : Fragment() {
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     showToast("Your id is saved")
+                    USER.id = userId
                     requireActivity().supportFragmentManager.popBackStack()
                 } else {
                     showToast(it.exception?.message ?: "")
                 }
 
             }
-    }
-
-    private fun showToast(text: String) {
-        Toast.makeText(
-            requireContext(),
-            text,
-            Toast.LENGTH_SHORT
-        ).show()
     }
 
     override fun onDestroyView() {

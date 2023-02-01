@@ -54,14 +54,14 @@ class ChangeNameFragment : Fragment() {
             REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_NAME).setValue(name)
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
-                        Toast.makeText(requireContext(), "Your name is saved", Toast.LENGTH_SHORT)
-                            .show()
+                        showToast("Your name is saved")
+                        USER.name = name
                         requireActivity().supportFragmentManager.popBackStack()
                     }
                 }
 
         } else {
-            Toast.makeText(requireContext(), "Name must not be empty", Toast.LENGTH_SHORT).show()
+            showToast("Name must not be empty")
         }
 
     }
