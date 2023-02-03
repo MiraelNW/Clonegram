@@ -8,5 +8,6 @@ data class ContactDbModel(
     @PrimaryKey
     val id: String,
     val name: String,
-    val number: String
+    val phone: String,
+    val photoUrl: String,
 )

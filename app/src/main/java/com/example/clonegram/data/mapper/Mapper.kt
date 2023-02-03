@@ -13,7 +13,8 @@ class Mapper @Inject constructor() {
     ) = ContactDbModel(
         id = contact.id,
         name = contact.name,
-        number = contact.number
+        phone = contact.phone,
+        photoUrl = contact.photoUrl
     )
 
     fun mapContactDbModelToContact(
@@ -21,25 +22,28 @@ class Mapper @Inject constructor() {
     ) = Contact(
         id = contactDbModel.id,
         name = contactDbModel.name,
-        number = contactDbModel.number
+        phone = contactDbModel.phone,
+        photoUrl = contactDbModel.photoUrl
     )
+
     fun mapUserInfoToUserDbModel(
         userInfo: UserInfo
     ) = UserDbModel(
-        uid = userInfo.id,
+        id = userInfo.id,
         name = userInfo.name,
         bio = userInfo.bio,
-        isOnline = userInfo.isOnline,
+        state = userInfo.state,
         photoUrl = userInfo.photoUrl,
         phone = userInfo.phone
     )
+
     fun mapUserDbModelToUserInfo(
         userDbModel: UserDbModel
     ) = UserInfo(
-        id = userDbModel.uid,
+        id = userDbModel.id,
         name = userDbModel.name,
         bio = userDbModel.bio,
-        isOnline = userDbModel.isOnline,
+        state = userDbModel.state,
         photoUrl = userDbModel.photoUrl,
         phone = userDbModel.phone
     )

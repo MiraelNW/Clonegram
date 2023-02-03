@@ -68,7 +68,6 @@ class ChangeBioFragment : Fragment() {
         }
         binding.etAboutYourself.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(str: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                Log.d("tag","beforetext")
                 val length = str?.length ?: 0
                 binding.countSymbols.text = (MAX_LENGTH - length).toString()
             }

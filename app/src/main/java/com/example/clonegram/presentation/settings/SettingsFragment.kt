@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
@@ -83,6 +84,7 @@ class SettingsFragment : Fragment() {
             settingsLogin.text = USER.id
             settingsBio.text = USER.bio
             settingsUserPhoto.downloadAndSetImage(USER.photoUrl)
+            userState.text = USER.state
         }
     }
 

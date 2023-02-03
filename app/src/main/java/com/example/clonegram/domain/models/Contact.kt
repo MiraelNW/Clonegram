@@ -1,7 +1,8 @@
 package com.example.clonegram.domain.models
 
 data class Contact(
-    val id:String,
-    val name:String,
-    val number:String
+    var id:String="",
+    var name:String ="",
+    var photoUrl: String="empty",
+    var phone:String="",
 )

@@ -15,6 +15,8 @@ lateinit var USER: UserInfo
 
 const val NODE_USERS = "users"
 const val NODE_USERS_ID = "usersid"
+const val NODE_PHONES_NUMBER = "phones"
+const val NODE_PHONES_CONTACT = "phone_contact"
 
 const val FOLDER_PROFILE_IMAGE = "profile_image"
 
@@ -23,6 +25,7 @@ const val CHILD_PHONE = "phone"
 const val CHILD_NAME = "name"
 const val CHILD_BIO = "bio"
 const val CHILD_PHOTO = "photoUrl"
+const val CHILD_STATE = "state"
 
 fun initFirebaseDatabase() {
     AUTH = FirebaseAuth.getInstance()

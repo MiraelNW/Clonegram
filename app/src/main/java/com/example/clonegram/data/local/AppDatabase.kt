@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import com.example.clonegram.data.local.models.ContactDbModel
 import com.example.clonegram.data.local.models.UserDbModel
 
-@Database(entities = [ContactDbModel::class, UserDbModel::class], version = 2, exportSchema = false)
+@Database(entities = [ContactDbModel::class, UserDbModel::class], version = 13, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     companion object {
         private const val DB_NAME = "AppDatabase"

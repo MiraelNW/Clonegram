@@ -14,7 +14,9 @@ import androidx.fragment.app.Fragment
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.EnterPhoneNumberFragmentBinding
+import com.example.clonegram.presentation.ChatsFragment
 import com.example.clonegram.utils.AUTH
+import com.example.clonegram.utils.showToast
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
@@ -56,13 +58,18 @@ class EnterPhoneNumberFragment : Fragment() {
             if (phoneNumber.isDone) {
                 callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                        AUTH.signInWithCredential(credential).addOnCompleteListener {
+                        AUTH.signInWithCredential(credential).addOnCompleteListener {task ->
+                            if (task.isSuccessful) {
+                                showToast("Добро пожаловать")
+                               startChatsFragment()
+                            } else {
+                                showToast(task.exception?.message.toString())
+                            }
                         }
                     }
 
                     override fun onVerificationFailed(error: FirebaseException) {
-                        Toast.makeText(requireContext(), error.message, Toast.LENGTH_SHORT).show()
-                        Log.d("tag",error.message.toString())
+                        showToast( error.message.toString())
                     }
 
                     override fun onCodeSent(id: String, p1: PhoneAuthProvider.ForceResendingToken) {
@@ -72,10 +79,16 @@ class EnterPhoneNumberFragment : Fragment() {
                 }
                 authUser(phoneNumber.masked)
             } else {
-                Toast.makeText(requireContext(), "Incorrect input", Toast.LENGTH_SHORT).show()
+                showToast("Incorrect input")
             }
         }
 
+    }
+
+    private fun startChatsFragment(){
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.container, ChatsFragment.newInstance())
+            .commit()
     }
 
     private fun startEnterCodeFragment(phoneNumber: String, id: String) {

@@ -14,6 +14,6 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(userDbModel: UserDbModel)
 
-    @Query("SELECT * FROM user WHERE uid=:uid")
-    fun getUser(uid : String): LiveData<UserDbModel>
+    @Query("SELECT * FROM user WHERE id=:id")
+    fun getUser(id : String): LiveData<UserDbModel>
 }

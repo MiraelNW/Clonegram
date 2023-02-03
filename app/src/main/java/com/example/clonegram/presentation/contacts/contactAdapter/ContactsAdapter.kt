@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.clonegram.databinding.ContactItemBinding
 import com.example.clonegram.domain.models.Contact
+import com.example.clonegram.utils.downloadAndSetImage
 
 class ContactsAdapter : ListAdapter<Contact, ContactsViewHolder>(ContactsDiffCallback) {
 
@@ -20,12 +21,10 @@ class ContactsAdapter : ListAdapter<Contact, ContactsViewHolder>(ContactsDiffCal
 
     override fun onBindViewHolder(holder: ContactsViewHolder, position: Int) {
         val contact = getItem(position)
-        Log.d("contact",contact.name)
-        Log.d("contact",contact.toString())
         with(holder.binding){
             name.text = contact.name
-
-            phoneNumber.text = contact.number
+            phoneNumber.text = contact.phone
+            contactAvatar.downloadAndSetImage(contact.photoUrl)
         }
     }
 }

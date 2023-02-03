@@ -6,11 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "user")
 data class UserDbModel(
     @PrimaryKey
-    val uid: String = "",
+    val id: String = "",
     val name: String = "",
-    val lastName: String = "",
     val bio: String = "",
-    val isOnline: String = "",
+    val state: String = "",
     val photoUrl: String = "",
     val phone: String = ""
 )

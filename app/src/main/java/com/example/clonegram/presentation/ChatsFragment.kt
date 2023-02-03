@@ -65,12 +65,21 @@ class ChatsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        createMenu()
     }
 
     override fun onResume() {
         super.onResume()
-        createMenu()
+        updateMenu()
+    }
+
+    private fun updateMenu() {
+        val profileItem = ProfileDrawerItem()
+            .withName(USER.name)
+            .withEmail(USER.phone)
+            .withIcon(USER.photoUrl)
+            .withIdentifier(200)
+        header.updateProfile(profileItem)
     }
 
     private fun createMenu(){
@@ -150,19 +159,24 @@ class ChatsFragment : Fragment() {
                     position: Int,
                     drawerItem: IDrawerItem<*>
                 ): Boolean {
-                    when (drawerItem.identifier.toInt()) {
-                        105 -> {
-                            startFragment(SettingsFragment.newInstance())
-                        }
-                        101 -> {
-                            startFragment(ContactsFragment.newInstance())
-                        }
-                    }
+                    onItemClick(drawerItem.identifier.toInt())
                     return false
                 }
             })
             .withAccountHeader(header)
             .build()
+    }
+
+    private fun onItemClick(position : Int){
+        when(position){
+            105 -> {
+                startFragment(SettingsFragment.newInstance())
+            }
+            101 -> {
+                startFragment(ContactsFragment.newInstance())
+            }
+        }
+
     }
 
     private fun initLoader(){
