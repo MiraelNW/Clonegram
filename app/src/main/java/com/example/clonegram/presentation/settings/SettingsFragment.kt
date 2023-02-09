@@ -6,13 +6,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.widget.ImageView
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.SettingsFragmentBinding
-import com.example.clonegram.presentation.MainActivity
 import com.example.clonegram.utils.*
 import com.google.firebase.storage.StorageReference
 import com.theartofdev.edmodo.cropper.CropImage
@@ -55,7 +55,7 @@ class SettingsFragment : Fragment() {
             startFragment(ChangeUserIdFragment.newInstance())
         }
         binding.settingsBtnChangeNumberPhone.setOnClickListener {
-            //TODO
+            //TODO()
         }
         binding.settingsChangePhoto.setOnClickListener {
             changeUserPhoto()
@@ -67,6 +67,7 @@ class SettingsFragment : Fragment() {
                 .commit()
         }
         binding.exit.setOnClickListener {
+            UserState.updateState(UserState.OFFLINE)
             AUTH.signOut()
             requireActivity().finish()
         }
@@ -81,19 +82,20 @@ class SettingsFragment : Fragment() {
         with(binding) {
             settingsUsername.text = USER.name
             settingsPhoneNumber.text = USER.phone
-            settingsLogin.text = USER.id
+            settingsLogin.text = USER.idName
+            settingsLogin.text = USER.idName
             settingsBio.text = USER.bio
             settingsUserPhoto.downloadAndSetImage(USER.photoUrl)
-            userState.text = USER.state
+            userState.text = UserState.ONLINE.state
         }
     }
 
     private fun changeUserPhoto() {
         CropImage.activity()
-            .setAspectRatio(1,1)
+            .setAspectRatio(1, 1)
             .setCropShape(CropImageView.CropShape.OVAL)
-            .setRequestedSize(300,300)
-            .start(requireActivity(),this)
+            .setRequestedSize(300, 300)
+            .start(requireActivity(), this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -104,11 +106,11 @@ class SettingsFragment : Fragment() {
             val uri = CropImage.getActivityResult(data).uri
             val path = REF_STORAGE_ROOT.child(FOLDER_PROFILE_IMAGE)
                 .child(UID)
-            putImageToStorage(uri,path){
-                getUrlFromStorage(path){
-                    putUrlToDatabase(it){
+            putImageToStorage(uri, path) {
+                getUrlFromStorage(path) {
+                    putUrlToDatabase(it) {
                         USER.photoUrl = it
-                            binding.settingsUserPhoto.downloadAndSetImage(it)
+                        binding.settingsUserPhoto.downloadAndSetImage(it)
                         showToast("Your photo is saved")
 
                     }
@@ -124,7 +126,7 @@ class SettingsFragment : Fragment() {
             .addOnFailureListener { showToast(it.message.toString()) }
     }
 
-    private fun getUrlFromStorage(path: StorageReference, function: (url : String) -> Unit) {
+    private fun getUrlFromStorage(path: StorageReference, function: (url: String) -> Unit) {
         path.downloadUrl
             .addOnSuccessListener { function(it.toString()) }
             .addOnFailureListener { showToast(it.message.toString()) }

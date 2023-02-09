@@ -1,6 +1,5 @@
 package com.example.clonegram.presentation.contacts.contactAdapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -9,6 +8,8 @@ import com.example.clonegram.domain.models.Contact
 import com.example.clonegram.utils.downloadAndSetImage
 
 class ContactsAdapter : ListAdapter<Contact, ContactsViewHolder>(ContactsDiffCallback) {
+
+    var onContactClickListener : OnContactClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactsViewHolder {
         val binding = ContactItemBinding.inflate(
@@ -26,5 +27,12 @@ class ContactsAdapter : ListAdapter<Contact, ContactsViewHolder>(ContactsDiffCal
             phoneNumber.text = contact.phone
             contactAvatar.downloadAndSetImage(contact.photoUrl)
         }
+        holder.itemView.setOnClickListener {
+            onContactClickListener?.onContactClick(contact)
+        }
+    }
+
+    interface OnContactClickListener{
+        fun onContactClick(contact: Contact)
     }
 }

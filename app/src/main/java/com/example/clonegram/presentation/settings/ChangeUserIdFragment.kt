@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.databinding.ChangeUserIdFragmentBinding
@@ -39,7 +38,7 @@ class ChangeUserIdFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.etUserId.setText(USER.id)
+        binding.etUserId.setText(USER.idName)
         binding.arrowBack.setOnClickListener {
             requireActivity().supportFragmentManager.popBackStack()
 
@@ -68,7 +67,7 @@ class ChangeUserIdFragment : Fragment() {
     }
 
     private fun updateCurrentUserId() {
-        REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_ID).setValue(userId)
+        REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_ID_NAME).setValue(userId)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     deleteOldUserId()
@@ -79,11 +78,11 @@ class ChangeUserIdFragment : Fragment() {
     }
 
     private fun deleteOldUserId() {
-        REF_DATABASE_ROOT.child(NODE_USERS_ID).child(USER.id).removeValue()
+        REF_DATABASE_ROOT.child(NODE_USERS_ID).child(USER.idName).removeValue()
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     showToast("Your id is saved")
-                    USER.id = userId
+                    USER.idName = userId
                     requireActivity().supportFragmentManager.popBackStack()
                 } else {
                     showToast(it.exception?.message ?: "")

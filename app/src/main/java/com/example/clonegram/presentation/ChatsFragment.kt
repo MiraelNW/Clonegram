@@ -4,26 +4,20 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.view.MenuHost
-import androidx.core.view.MenuProvider
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.ChatsFragmentBinding
-import com.example.clonegram.presentation.authication.StartCommunicationFragment
 import com.example.clonegram.presentation.contacts.ContactsFragment
 import com.example.clonegram.presentation.settings.SettingsFragment
-import com.example.clonegram.utils.AUTH
 import com.example.clonegram.utils.USER
+import com.example.clonegram.utils.UserState
 import com.example.clonegram.utils.downloadAndSetImage
-import com.google.firebase.auth.FirebaseAuth
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -65,6 +59,7 @@ class ChatsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        UserState.updateState(UserState.ONLINE)
         createMenu()
     }
 

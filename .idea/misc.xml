@@ -3,15 +3,22 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/drawable-v24/bg_receiver_message.xml" value="0.1" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/drawable/bg_user_message.xml" value="0.194" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/drawable/drawable_cursor.xml" value="0.108" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/drawable/header.xml" value="0.1" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/drawable/ic_send.xml" value="0.194" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/change_bio_fragment.xml" value="0.33" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/change_phone_number.xml" value="0.365625" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/chats_fragment.xml" value="0.33" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/contact_item.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/contacts_fragment.xml" value="0.33240740740740743" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/message_item.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/receiver_message_item.xml" value="0.33" />
         <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/settings_fragment.xml" value="0.3148148148148148" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/single_chat_fragment.xml" value="0.33" />
+        <entry key="..\:/Users/1/AndroidStudioProjects/Clonegram/app/src/main/res/layout/user_message_item.xml" value="0.36666666666666664" />
       </map>
     </option>
   </component>

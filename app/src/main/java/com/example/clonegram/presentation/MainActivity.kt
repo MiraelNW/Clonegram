@@ -2,27 +2,24 @@ package com.example.clonegram.presentation
 
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.ActivityMainBinding
 import com.example.clonegram.domain.models.Contact
+import com.example.clonegram.domain.models.UserInfo
 import com.example.clonegram.presentation.authication.StartCommunicationFragment
 import com.example.clonegram.utils.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-import com.example.clonegram.domain.models.UserInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
@@ -127,6 +124,7 @@ class MainActivity : AppCompatActivity() {
                     phone = phone
                 )
                 arrayContacts.add(contact)
+
             }
         }
         updatePhonesList(arrayContacts)
@@ -134,43 +132,37 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updatePhonesList(arrayContacts: ArrayList<Contact>) {
-        REF_DATABASE_ROOT.child(NODE_PHONES_NUMBER)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    dataSnapshot.children.forEach { snapshot ->
-                        arrayContacts.forEach { contact ->
-                            Log.d("phoro", contact.toString())
-                            Log.d("phoro", snapshot.key.toString())
-                            if (snapshot.key == contact.phone) {
-
-                                insertPhoto(snapshot){
-                                    CoroutineScope(Dispatchers.IO).launch {
-
-                                        viewModel.insertContact.invoke(it)
+        if (AUTH.currentUser != null) {
+            REF_DATABASE_ROOT.child(NODE_PHONES_NUMBER)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        dataSnapshot.children.forEach { snapshot ->
+                            arrayContacts.forEach { contact ->
+                                if (snapshot.key == contact.phone) {
+                                    insertContact(snapshot) {
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            viewModel.insertContact.invoke(it)
+                                        }
                                     }
+                                    REF_DATABASE_ROOT.child(NODE_PHONES_CONTACT).child(UID)
+                                        .child(snapshot.value.toString()).child(CHILD_ID)
+                                        .setValue(snapshot.value.toString())
+                                        .addOnFailureListener { showToast(it.message.toString()) }
                                 }
-
-
-                                REF_DATABASE_ROOT.child(NODE_PHONES_CONTACT).child(UID)
-                                    .child(snapshot.value.toString()).child(CHILD_ID)
-                                    .setValue(snapshot.value.toString())
-                                    .addOnFailureListener { showToast(it.message.toString()) }
                             }
                         }
                     }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                }
-            })
+                    override fun onCancelled(error: DatabaseError) {
+                    }
+                })
+        }
     }
 
-    private fun insertPhoto(snapshot : DataSnapshot, function: (contact:Contact) -> Unit) {
+    private fun insertContact(snapshot: DataSnapshot, function: (contact: Contact) -> Unit) {
         REF_DATABASE_ROOT.child(NODE_USERS).child(snapshot.value.toString())
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot2: DataSnapshot) {
-                   val contact = snapshot2.getValue(Contact::class.java) ?: Contact()
-
+                    val contact = snapshot2.getValue(Contact::class.java) ?: Contact()
                     function(contact)
                 }
 

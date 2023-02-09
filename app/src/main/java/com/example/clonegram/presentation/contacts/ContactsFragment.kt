@@ -7,12 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
-import com.example.clonegram.utils.ViewModelFactory
 import com.example.clonegram.databinding.ContactsFragmentBinding
+import com.example.clonegram.domain.models.Contact
 import com.example.clonegram.presentation.contacts.contactAdapter.ContactsAdapter
+import com.example.clonegram.presentation.singleChat.SingleChatFragment
+import com.example.clonegram.utils.ViewModelFactory
 import javax.inject.Inject
 
 class ContactsFragment : Fragment() {
@@ -47,11 +48,17 @@ class ContactsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel = ViewModelProvider(this,viewModelFactory)[ContactViewModel::class.java]
+        viewModel = ViewModelProvider(this, viewModelFactory)[ContactViewModel::class.java]
 
         val adapter = ContactsAdapter()
         binding.contactsRecyclerView.adapter = adapter
-        viewModel.contactList().observe(viewLifecycleOwner){
+        adapter.onContactClickListener = object : ContactsAdapter.OnContactClickListener {
+            override fun onContactClick(contact: Contact) {
+                startSingleChatFragment(contact)
+            }
+
+        }
+        viewModel.contactList().observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
 
@@ -59,6 +66,12 @@ class ContactsFragment : Fragment() {
             requireActivity().supportFragmentManager.popBackStack()
         }
 
+    }
+
+    private fun startSingleChatFragment(contact: Contact) {
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.container, SingleChatFragment.newInstance(contact))
+            .commit()
     }
 
 

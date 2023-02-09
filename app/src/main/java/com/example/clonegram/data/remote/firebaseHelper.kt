@@ -17,15 +17,23 @@ const val NODE_USERS = "users"
 const val NODE_USERS_ID = "usersid"
 const val NODE_PHONES_NUMBER = "phones"
 const val NODE_PHONES_CONTACT = "phone_contact"
+const val NODE_MESSAGES = "messages"
 
 const val FOLDER_PROFILE_IMAGE = "profile_image"
 
+const val TYPE_TEXT = "text"
+
 const val CHILD_ID = "id"
+const val CHILD_ID_NAME = "idName"
 const val CHILD_PHONE = "phone"
 const val CHILD_NAME = "name"
 const val CHILD_BIO = "bio"
 const val CHILD_PHOTO = "photoUrl"
 const val CHILD_STATE = "state"
+const val CHILD_TEXT = "text"
+const val CHILD_TYPE = "type"
+const val CHILD_FROM = "from"
+const val CHILD_TIMESTAMP = "timeStamp"
 
 fun initFirebaseDatabase() {
     AUTH = FirebaseAuth.getInstance()
