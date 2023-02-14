@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.ChatsFragmentBinding
@@ -154,7 +155,8 @@ class ChatsFragment : Fragment() {
                     position: Int,
                     drawerItem: IDrawerItem<*>
                 ): Boolean {
-                    onItemClick(drawerItem.identifier.toInt())
+                    findNavController().navigate(loadFragment(drawerItem.identifier.toInt()))
+                    disableDrawer()
                     return false
                 }
             })
@@ -162,16 +164,18 @@ class ChatsFragment : Fragment() {
             .build()
     }
 
-    private fun onItemClick(position : Int){
-        when(position){
+    private fun loadFragment(position : Int):Int{
+        return when(position){
             105 -> {
-                startFragment(SettingsFragment.newInstance())
+              R.id.action_chatsFragment_to_settingsFragment
             }
             101 -> {
-                startFragment(ContactsFragment.newInstance())
+                R.id.action_chatsFragment_to_contactsFragment
+            }
+            else -> {
+               0
             }
         }
-
     }
 
     private fun initLoader(){
@@ -186,22 +190,12 @@ class ChatsFragment : Fragment() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 
-    private fun startFragment(fragment : Fragment){
-        disableDrawer()
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container,fragment)
-            .addToBackStack(null)
-            .commit()
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
     companion object {
-        fun newInstance() = ChatsFragment()
-
         private const val IDENTIFIER_CREATE_GROUP = 100L
         private const val CREATE_GROUP = "Создать группу"
 

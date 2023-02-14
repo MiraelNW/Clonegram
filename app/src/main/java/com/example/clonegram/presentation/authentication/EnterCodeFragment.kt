@@ -1,20 +1,19 @@
-package com.example.clonegram.presentation.authication
+package com.example.clonegram.presentation.authentication
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.EnterCodeFragmentBinding
 import com.example.clonegram.domain.models.UserInfo
-import com.example.clonegram.presentation.ChatsFragment
 import com.example.clonegram.utils.*
 import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.database.DataSnapshot
@@ -33,6 +32,8 @@ class EnterCodeFragment : Fragment() {
     @Inject
     lateinit var factory: ViewModelFactory
     private lateinit var viewModel: EnterCodeViewModel
+
+    private val args by navArgs<EnterCodeFragmentArgs>()
 
     private var _binding: EnterCodeFragmentBinding? = null
     private val binding: EnterCodeFragmentBinding
@@ -106,9 +107,7 @@ class EnterCodeFragment : Fragment() {
     }
 
     private fun startChatFragment() {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container, ChatsFragment.newInstance())
-            .commit()
+       findNavController().navigate(R.id.action_enterCodeFragment_to_mainFragment2)
     }
 
     override fun onDestroyView() {
@@ -117,20 +116,7 @@ class EnterCodeFragment : Fragment() {
     }
 
     private fun parseArgs() {
-        phoneNumber = requireArguments().getString(PHONE_NUMBER) ?: ""
-        id = requireArguments().getString(ID) ?: ""
-    }
-
-    companion object {
-        private const val PHONE_NUMBER = "phone_number"
-        private const val ID = "id"
-        fun newInstance(phoneNumber: String, id: String): EnterCodeFragment {
-            return EnterCodeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(PHONE_NUMBER, phoneNumber)
-                    putString(ID, id)
-                }
-            }
-        }
+        phoneNumber = args.phoneNumber
+        id = args.id
     }
 }

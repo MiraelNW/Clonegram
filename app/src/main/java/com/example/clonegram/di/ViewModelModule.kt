@@ -2,7 +2,7 @@ package com.example.clonegram.di
 
 import androidx.lifecycle.ViewModel
 import com.example.clonegram.presentation.MainViewModel
-import com.example.clonegram.presentation.authication.EnterCodeViewModel
+import com.example.clonegram.presentation.authentication.EnterCodeViewModel
 import com.example.clonegram.presentation.contacts.ContactViewModel
 import dagger.Binds
 import dagger.Module

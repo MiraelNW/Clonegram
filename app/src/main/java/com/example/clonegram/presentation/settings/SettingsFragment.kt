@@ -3,18 +3,16 @@ package com.example.clonegram.presentation.settings
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.SettingsFragmentBinding
 import com.example.clonegram.utils.*
-import com.google.firebase.storage.StorageReference
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 
@@ -46,13 +44,13 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.arrowBack.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+           findNavController().popBackStack()
         }
         binding.settingsBtnChangeBio.setOnClickListener {
-            startFragment(ChangeBioFragment.newInstance())
+            findNavController().navigate(R.id.action_settingsFragment_to_changeBioFragment)
         }
         binding.settingsBtnChangeLogin.setOnClickListener {
-            startFragment(ChangeUserIdFragment.newInstance())
+            findNavController().navigate(R.id.action_settingsFragment_to_changeUserIdFragment)
         }
         binding.settingsBtnChangeNumberPhone.setOnClickListener {
             //TODO()
@@ -61,10 +59,7 @@ class SettingsFragment : Fragment() {
             changeUserPhoto()
         }
         binding.changeName.setOnClickListener {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.container, ChangeNameFragment.newInstance())
-                .addToBackStack(null)
-                .commit()
+            findNavController().navigate(R.id.action_settingsFragment_to_changeNameFragment)
         }
         binding.exit.setOnClickListener {
             UserState.updateState(UserState.OFFLINE)
@@ -94,7 +89,7 @@ class SettingsFragment : Fragment() {
         CropImage.activity()
             .setAspectRatio(1, 1)
             .setCropShape(CropImageView.CropShape.OVAL)
-            .setRequestedSize(300, 300)
+            .setRequestedSize(250, 250)
             .start(requireActivity(), this)
     }
 
@@ -106,51 +101,23 @@ class SettingsFragment : Fragment() {
             val uri = CropImage.getActivityResult(data).uri
             val path = REF_STORAGE_ROOT.child(FOLDER_PROFILE_IMAGE)
                 .child(UID)
-            putImageToStorage(uri, path) {
+            putFileToStorage(uri, path) {
                 getUrlFromStorage(path) {
                     putUrlToDatabase(it) {
                         USER.photoUrl = it
                         binding.settingsUserPhoto.downloadAndSetImage(it)
                         showToast("Your photo is saved")
-
                     }
                 }
             }
         }
     }
 
-    private fun putUrlToDatabase(url: String, function: () -> Unit) {
-        REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
-            .child(CHILD_PHOTO).setValue(url)
-            .addOnSuccessListener { function() }
-            .addOnFailureListener { showToast(it.message.toString()) }
-    }
 
-    private fun getUrlFromStorage(path: StorageReference, function: (url: String) -> Unit) {
-        path.downloadUrl
-            .addOnSuccessListener { function(it.toString()) }
-            .addOnFailureListener { showToast(it.message.toString()) }
-    }
 
-    private fun putImageToStorage(uri: Uri, path: StorageReference, function: () -> Unit) {
-        path.putFile(uri)
-            .addOnSuccessListener { function() }
-            .addOnFailureListener { showToast(it.message.toString()) }
-    }
-
-    private fun startFragment(fragment: Fragment) {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container, fragment)
-            .addToBackStack(null)
-            .commit()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        fun newInstance() = SettingsFragment()
     }
 }

@@ -8,8 +8,8 @@ import com.squareup.picasso.Picasso
 import java.text.SimpleDateFormat
 import java.util.*
 
-fun Fragment.showToast(text: String) {
-    Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
+fun showToast(text: String) {
+    Toast.makeText(APP_ACTIVITY, text, Toast.LENGTH_SHORT).show()
 }
 
 fun ImageView.downloadAndSetImage(url:String){

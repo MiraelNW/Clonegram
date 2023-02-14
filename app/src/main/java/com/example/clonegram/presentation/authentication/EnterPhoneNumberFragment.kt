@@ -1,16 +1,12 @@
-package com.example.clonegram.presentation.authication
+package com.example.clonegram.presentation.authentication
 
 import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.EnterPhoneNumberFragmentBinding
@@ -21,7 +17,6 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
-import com.santalu.maskara.MaskChangedListener
 import java.util.concurrent.TimeUnit
 
 
@@ -58,10 +53,10 @@ class EnterPhoneNumberFragment : Fragment() {
             if (phoneNumber.isDone) {
                 callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-                        AUTH.signInWithCredential(credential).addOnCompleteListener {task ->
+                        AUTH.signInWithCredential(credential).addOnCompleteListener { task ->
                             if (task.isSuccessful) {
                                 showToast("Добро пожаловать")
-                               startChatsFragment()
+                                startChatsFragment()
                             } else {
                                 showToast(task.exception?.message.toString())
                             }
@@ -69,7 +64,7 @@ class EnterPhoneNumberFragment : Fragment() {
                     }
 
                     override fun onVerificationFailed(error: FirebaseException) {
-                        showToast( error.message.toString())
+                        showToast(error.message.toString())
                     }
 
                     override fun onCodeSent(id: String, p1: PhoneAuthProvider.ForceResendingToken) {
@@ -85,17 +80,17 @@ class EnterPhoneNumberFragment : Fragment() {
 
     }
 
-    private fun startChatsFragment(){
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container, ChatsFragment.newInstance())
-            .commit()
+    private fun startChatsFragment() {
+        findNavController().navigate(R.id.action_enterPhoneNumberFragment_to_mainFragment2)
     }
 
     private fun startEnterCodeFragment(phoneNumber: String, id: String) {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container, EnterCodeFragment.newInstance(phoneNumber, id))
-            .addToBackStack(null)
-            .commit()
+        findNavController().navigate(
+            EnterPhoneNumberFragmentDirections.actionEnterPhoneNumberFragmentToEnterCodeFragment(
+                phoneNumber,
+                id
+            )
+        )
     }
 
     private fun authUser(phoneNumber: String) {

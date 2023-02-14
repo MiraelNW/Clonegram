@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.databinding.ChangeBioFragmentBinding
 import com.example.clonegram.utils.*
@@ -41,7 +42,7 @@ class ChangeBioFragment : Fragment() {
         binding.etAboutYourself.setText(USER.bio)
         changeBio()
         binding.arrowBack.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+           findNavController().popBackStack()
 
         }
         binding.accept.setOnClickListener {
@@ -88,20 +89,17 @@ class ChangeBioFragment : Fragment() {
                     if (it.isSuccessful) {
                         showToast("Your bio is saved")
                         USER.bio = bio
-                        requireActivity().supportFragmentManager.popBackStack()
+                        findNavController().popBackStack()
                     }
                 }
         } else {
             USER.bio = DEFAULT_BIO
-            requireActivity().supportFragmentManager.popBackStack()
+            findNavController().popBackStack()
         }
     }
 
     companion object {
         private const val MAX_LENGTH = 70
         private const val DEFAULT_BIO = "About yourself"
-        fun newInstance() = ChangeBioFragment()
     }
-
-
 }

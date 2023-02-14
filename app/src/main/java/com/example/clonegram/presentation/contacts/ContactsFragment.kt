@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.ContactsFragmentBinding
@@ -54,34 +55,23 @@ class ContactsFragment : Fragment() {
         binding.contactsRecyclerView.adapter = adapter
         adapter.onContactClickListener = object : ContactsAdapter.OnContactClickListener {
             override fun onContactClick(contact: Contact) {
-                startSingleChatFragment(contact)
+                findNavController().navigate(
+                    ContactsFragmentDirections.actionContactsFragmentToSingleChatFragment(
+                        contact
+                    )
+                )
             }
 
         }
         viewModel.contactList().observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
-
-        binding.arrowBack.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
-        }
+        binding.arrowBack.setOnClickListener { findNavController().popBackStack() }
 
     }
-
-    private fun startSingleChatFragment(contact: Contact) {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.container, SingleChatFragment.newInstance(contact))
-            .commit()
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        private const val READ_CONTACTS_RC = 101
-        fun newInstance() = ContactsFragment()
     }
 }

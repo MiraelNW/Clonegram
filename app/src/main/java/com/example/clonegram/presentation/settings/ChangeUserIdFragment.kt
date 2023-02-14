@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.databinding.ChangeUserIdFragmentBinding
 import com.example.clonegram.utils.*
@@ -40,7 +41,7 @@ class ChangeUserIdFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.etUserId.setText(USER.idName)
         binding.arrowBack.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+            findNavController().popBackStack()
 
         }
         binding.accept.setOnClickListener {
@@ -83,7 +84,7 @@ class ChangeUserIdFragment : Fragment() {
                 if (it.isSuccessful) {
                     showToast("Your id is saved")
                     USER.idName = userId
-                    requireActivity().supportFragmentManager.popBackStack()
+                    findNavController().popBackStack()
                 } else {
                     showToast(it.exception?.message ?: "")
                 }
@@ -95,9 +96,4 @@ class ChangeUserIdFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
-    companion object {
-        fun newInstance() = ChangeUserIdFragment()
-    }
-
 }

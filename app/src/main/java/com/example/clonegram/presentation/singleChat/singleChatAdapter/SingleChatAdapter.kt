@@ -1,72 +1,69 @@
 package com.example.clonegram.presentation.singleChat.singleChatAdapter
 
-import android.content.Context
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintSet
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.clonegram.R
-import com.example.clonegram.databinding.UserMessageItemBinding
-import com.example.clonegram.domain.models.UserInfo
-import com.example.clonegram.utils.UID
-import com.example.clonegram.utils.time
+import com.example.clonegram.presentation.singleChat.singleChatAdapter.messageRecyclerView.viewHolders.*
+import com.example.clonegram.presentation.singleChat.singleChatAdapter.messageRecyclerView.views.MessageView
 
-class SingleChatAdapter : RecyclerView.Adapter<SingleChatViewHolder>() {
+class SingleChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var listMessagesCache = mutableListOf<UserInfo>()
+    private var listMessagesCache = mutableListOf<MessageView>()
+    private var listHolders = mutableListOf<MessageHolder>()
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SingleChatViewHolder {
-        val binding =UserMessageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return SingleChatViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return HolderFactory.getHolder(parent,viewType)
     }
 
-    override fun onBindViewHolder(holder: SingleChatViewHolder, position: Int) {
-        if (listMessagesCache[position].from == UID) {
-            with(holder.binding){
-                blocUserMessage.visibility = View.VISIBLE
-                blocReceiverMessage.visibility = View.GONE
-                chatUserMessage.text = listMessagesCache[position].text
-                chatUserMessageTime.text =
-                    listMessagesCache[position].timeStamp.toString().time()
-            }
-        } else {
-            with(holder.binding){
-                blocUserMessage.visibility = View.GONE
-                blocReceiverMessage.visibility = View.VISIBLE
-                chatReceiverMessage.text = listMessagesCache[position].text
-                chatReceiverMessageTime.text =
-                    listMessagesCache[position].timeStamp.toString().time()
-            }
-        }
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        (holder as MessageHolder).drawMessage(listMessagesCache[position])
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return listMessagesCache[position].getTypeView()
     }
 
     override fun getItemCount(): Int = listMessagesCache.size
 
-    override fun onViewRecycled(holder: SingleChatViewHolder) {
-        super.onViewRecycled(holder)
+    override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
+        (holder as MessageHolder).onAttach(listMessagesCache[holder.absoluteAdapterPosition])
+        listHolders.add(holder as MessageHolder)
+        super.onViewAttachedToWindow(holder)
     }
 
-    fun addItem(
-        item: UserInfo,
-        toBottom: Boolean,
+    override fun onViewDetachedFromWindow(holder: RecyclerView.ViewHolder) {
+        (holder as MessageHolder).onDetach()
+        listHolders.remove(holder as MessageHolder)
+        super.onViewDetachedFromWindow(holder)
+    }
+
+
+    fun addItemToBottom(
+        item: MessageView,
         onSuccess: () -> Unit
     ) {
-        if (toBottom) {
-            if (!listMessagesCache.contains(item)) {
-                listMessagesCache.add(item)
-                notifyItemInserted(listMessagesCache.size)
-            }
-        } else {
-            if (!listMessagesCache.contains(item)) {
-                listMessagesCache.add(item)
-                listMessagesCache.sortBy { it.timeStamp.toString() }
-                notifyItemInserted(0)
-            }
+        if (!listMessagesCache.contains(item)) {
+            listMessagesCache.add(item)
+            notifyItemInserted(listMessagesCache.size)
         }
         onSuccess()
     }
+
+    fun addItemToTop(
+        item: MessageView,
+        onSuccess: () -> Unit
+    ) {
+        if (!listMessagesCache.contains(item)) {
+            listMessagesCache.add(item)
+            listMessagesCache.sortBy { it.timeStamp }
+            notifyItemInserted(0)
+        }
+        onSuccess()
+    }
+
+    fun destroy(){
+        listHolders.forEach {
+            it.onDetach()
+        }
+    }
+
 }

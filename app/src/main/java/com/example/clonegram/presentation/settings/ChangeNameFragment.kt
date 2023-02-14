@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.databinding.ChangeNameFragmentBinding
 import com.example.clonegram.utils.*
@@ -41,7 +42,7 @@ class ChangeNameFragment : Fragment() {
             changeName()
         }
         binding.arrowBack.setOnClickListener {
-            requireActivity().supportFragmentManager.popBackStack()
+           findNavController().popBackStack()
         }
 
 
@@ -55,7 +56,7 @@ class ChangeNameFragment : Fragment() {
                     if (it.isSuccessful) {
                         showToast("Your name is saved")
                         USER.name = name
-                        requireActivity().supportFragmentManager.popBackStack()
+                       findNavController().popBackStack()
                     }
                 }
 

@@ -4,9 +4,10 @@ import android.app.Application
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.presentation.ChatsFragment
 import com.example.clonegram.presentation.MainActivity
-import com.example.clonegram.presentation.authication.EnterCodeFragment
-import com.example.clonegram.presentation.authication.EnterPhoneNumberFragment
-import com.example.clonegram.presentation.authication.StartCommunicationFragment
+import com.example.clonegram.presentation.MainFragment
+import com.example.clonegram.presentation.authentication.EnterCodeFragment
+import com.example.clonegram.presentation.authentication.EnterPhoneNumberFragment
+import com.example.clonegram.presentation.authentication.StartCommunicationFragment
 import com.example.clonegram.presentation.settings.SettingsFragment
 import com.example.clonegram.presentation.contacts.ContactsFragment
 import com.example.clonegram.presentation.settings.ChangeBioFragment
@@ -28,6 +29,7 @@ interface ApplicationComponent {
     fun inject(fragment: EnterPhoneNumberFragment)
     fun inject(fragment: EnterCodeFragment)
     fun inject(fragment: ChangeNameFragment)
+    fun inject(fragment: MainFragment)
     fun inject(app: ClonegramApp)
 
     @Component.Factory

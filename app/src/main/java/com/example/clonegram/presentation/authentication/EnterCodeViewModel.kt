@@ -1,4 +1,4 @@
-package com.example.clonegram.presentation.authication
+package com.example.clonegram.presentation.authentication
 
 import androidx.lifecycle.ViewModel
 import com.example.clonegram.domain.usecases.InsertUserUseCase

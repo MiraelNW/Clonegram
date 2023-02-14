@@ -1,4 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_navigation" />
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/mainFragment2">
+    <fragment
+        android:id="@+id/mainFragment2"
+        android:name="com.example.clonegram.presentation.MainFragment"
+        android:label="main_fragment"
+        tools:layout="@layout/main_fragment" >
+        <action
+            android:id="@+id/action_mainFragment2_to_startCommunicationFragment2"
+            app:destination="@id/startCommunicationFragment2" />
+        <action
+            android:id="@+id/action_mainFragment2_to_chatsFragment"
+            app:destination="@id/chatsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/startCommunicationFragment2"
+        android:name="com.example.clonegram.presentation.authentication.StartCommunicationFragment"
+        android:label="start_communication_fragment"
+        tools:layout="@layout/start_communication_fragment" >
+        <action
+            android:id="@+id/action_startCommunicationFragment2_to_enterPhoneNumberFragment"
+            app:destination="@id/enterPhoneNumberFragment"
+            app:popUpTo="@id/startCommunicationFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatsFragment"
+        android:name="com.example.clonegram.presentation.ChatsFragment"
+        android:label="chats_fragment"
+        tools:layout="@layout/chats_fragment" >
+        <action
+            android:id="@+id/action_chatsFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment"
+            app:popUpTo="@id/chatsFragment" />
+        <action
+            android:id="@+id/action_chatsFragment_to_contactsFragment"
+            app:destination="@id/contactsFragment"
+            app:popUpTo="@id/chatsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/enterCodeFragment"
+        android:name="com.example.clonegram.presentation.authentication.EnterCodeFragment"
+        android:label="enter_code_fragment"
+        tools:layout="@layout/enter_code_fragment" >
+        <argument
+            android:name="phoneNumber"
+            app:argType="string" />
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_enterCodeFragment_to_mainFragment2"
+            app:destination="@id/mainFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/enterPhoneNumberFragment"
+        android:name="com.example.clonegram.presentation.authentication.EnterPhoneNumberFragment"
+        android:label="enter_phone_number_fragment"
+        tools:layout="@layout/enter_phone_number_fragment" >
+        <action
+            android:id="@+id/action_enterPhoneNumberFragment_to_enterCodeFragment"
+            app:destination="@id/enterCodeFragment"
+            app:popUpTo="@id/startCommunicationFragment2" />
+        <action
+            android:id="@+id/action_enterPhoneNumberFragment_to_mainFragment2"
+            app:destination="@id/mainFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.clonegram.presentation.settings.SettingsFragment"
+        android:label="settings_fragment"
+        tools:layout="@layout/settings_fragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_changeUserIdFragment"
+            app:destination="@id/changeUserIdFragment"
+            app:popUpTo="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_changeNameFragment"
+            app:destination="@id/changeNameFragment"
+            app:popUpTo="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_changeBioFragment"
+            app:destination="@id/changeBioFragment"
+            app:popUpTo="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/changeBioFragment"
+        android:name="com.example.clonegram.presentation.settings.ChangeBioFragment"
+        android:label="change_bio_fragment"
+        tools:layout="@layout/change_bio_fragment" />
+    <fragment
+        android:id="@+id/changeNameFragment"
+        android:name="com.example.clonegram.presentation.settings.ChangeNameFragment"
+        android:label="change_name_fragment"
+        tools:layout="@layout/change_name_fragment" />
+    <fragment
+        android:id="@+id/changeUserIdFragment"
+        android:name="com.example.clonegram.presentation.settings.ChangeUserIdFragment"
+        android:label="change_user_id_fragment"
+        tools:layout="@layout/change_user_id_fragment" />
+    <fragment
+        android:id="@+id/contactsFragment"
+        android:name="com.example.clonegram.presentation.contacts.ContactsFragment"
+        android:label="contacts_fragment"
+        tools:layout="@layout/contacts_fragment" >
+        <action
+            android:id="@+id/action_contactsFragment_to_singleChatFragment"
+            app:destination="@id/singleChatFragment"
+            app:popUpTo="@id/chatsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/singleChatFragment"
+        android:name="com.example.clonegram.presentation.singleChat.SingleChatFragment"
+        android:label="single_chat_fragment"
+        tools:layout="@layout/single_chat_fragment" >
+        <argument
+            android:name="contact"
+            app:argType="com.example.clonegram.domain.models.Contact" />
+    </fragment>
+</navigation>
