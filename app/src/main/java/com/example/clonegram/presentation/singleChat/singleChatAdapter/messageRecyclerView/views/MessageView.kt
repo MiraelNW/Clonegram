@@ -16,5 +16,7 @@ interface MessageView {
             get() = 1
         val MESSAGE_VOICE: Int
             get() = 2
+        val MESSAGE_FILE: Int
+            get() = 3
     }
 }

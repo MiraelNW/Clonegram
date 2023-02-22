@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.EnterPhoneNumberFragmentBinding
-import com.example.clonegram.presentation.ChatsFragment
 import com.example.clonegram.utils.AUTH
 import com.example.clonegram.utils.showToast
 import com.google.firebase.FirebaseException

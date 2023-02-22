@@ -1,5 +1,10 @@
 package com.example.clonegram.domain.models
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
+
+@Parcelize
 data class UserInfo(
     var id: String = "",
     var idName: String = "",
@@ -13,8 +18,11 @@ data class UserInfo(
     var text: String = "",
     var type: String = "",
     var from: String = "",
-    var timeStamp: Any = ""
-){
+    var timeStamp: @RawValue Any = "",
+
+
+    var lastMessage: String = ""
+) : Parcelable {
     override fun equals(other: Any?): Boolean {
         return (other as UserInfo).id == id
     }

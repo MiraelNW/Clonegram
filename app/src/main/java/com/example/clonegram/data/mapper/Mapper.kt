@@ -1,16 +1,15 @@
 package com.example.clonegram.data.mapper
 
-import com.example.clonegram.data.local.models.ContactDbModel
 import com.example.clonegram.data.local.models.UserDbModel
-import com.example.clonegram.domain.models.Contact
+import com.example.clonegram.data.local.models.UserInfoDbModel
 import com.example.clonegram.domain.models.UserInfo
 import javax.inject.Inject
 
 class Mapper @Inject constructor() {
 
     fun mapContactToContactDbModel(
-        contact: Contact
-    ) = ContactDbModel(
+        contact: UserInfo
+    ) = UserInfoDbModel(
         id = contact.id,
         name = contact.name,
         phone = contact.phone,
@@ -18,8 +17,8 @@ class Mapper @Inject constructor() {
     )
 
     fun mapContactDbModelToContact(
-        contactDbModel: ContactDbModel
-    ) = Contact(
+        contactDbModel: UserInfoDbModel
+    ) = UserInfo(
         id = contactDbModel.id,
         name = contactDbModel.name,
         phone = contactDbModel.phone,

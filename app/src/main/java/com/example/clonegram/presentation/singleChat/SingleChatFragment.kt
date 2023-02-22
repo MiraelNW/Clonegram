@@ -1,10 +1,10 @@
 package com.example.clonegram.presentation.singleChat
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -20,15 +20,16 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.clonegram.R
 import com.example.clonegram.databinding.SingleChatFragmentBinding
-import com.example.clonegram.domain.models.Contact
 import com.example.clonegram.domain.models.UserInfo
 import com.example.clonegram.presentation.singleChat.singleChatAdapter.SingleChatAdapter
 import com.example.clonegram.presentation.singleChat.singleChatAdapter.messageRecyclerView.views.ViewFactory
 import com.example.clonegram.utils.*
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.database.*
-import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
 import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,18 +45,21 @@ class SingleChatFragment : Fragment() {
     private lateinit var adapter: SingleChatAdapter
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var voiceRecorder: VoiceRecorder
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
+
     private var countMessages = 20
     private var isNeedSmoothScroll = true
     private var isScrolling = false
-    private var isPermissionGranted = false
+    private var isRecordAudioPermissionGranted = false
+
 
     private var _binding: SingleChatFragmentBinding? = null
     private val binding: SingleChatFragmentBinding
         get() = _binding ?: throw RuntimeException("SingleChatFragmentBinding is null")
 
     private val args by navArgs<SingleChatFragmentArgs>()
-    private val contact by lazy {
-        args.contact
+    private val user by lazy {
+        args.userInfo
     }
 
     override fun onCreateView(
@@ -74,21 +78,25 @@ class SingleChatFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        initReceiver() {
+        if (user.id == UID) {
             initFields()
+        } else {
+            initReceiver() {
+                initFields()
+            }
         }
         initRecycler()
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        // _binding = null
         voiceRecorder.releaseRecorder()
         adapter.destroy()
         binding.rvSwipeRefresh.isEnabled = false
+        refMessages.removeEventListener(messageListener)
+        refUser.removeEventListener(messageListener)
     }
-
 
     private fun initRecycler() {
 
@@ -97,12 +105,11 @@ class SingleChatFragment : Fragment() {
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
         recyclerView.isNestedScrollingEnabled = false
-        refMessages = REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(contact.id)
+        refMessages = REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(user.id)
         messageListener = AppEventListener {
             it.children.map { snapshot ->
                 val message = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
                 if (isNeedSmoothScroll) {
-                    Log.d("rv",message.toString())
                     adapter.addItemToBottom(ViewFactory.getView(message)) {
                         recyclerView.smoothScrollToPosition(adapter.itemCount)
                     }
@@ -115,6 +122,7 @@ class SingleChatFragment : Fragment() {
                 }
             }
         }
+
 
         refMessages.limitToLast(countMessages).addValueEventListener(messageListener)
 
@@ -154,33 +162,49 @@ class SingleChatFragment : Fragment() {
         refMessages.limitToLast(countMessages).addValueEventListener(messageListener)
     }
 
-
     @SuppressLint("ClickableViewAccessibility")
     private fun initFields() {
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetChoice)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         setVisibilityMode()
         voiceRecorder = VoiceRecorder()
         layoutManager = LinearLayoutManager(requireContext())
-        binding.chatUserPhoto.downloadAndSetImage(receiver.photoUrl)
-        binding.chatUsername.text = receiver.name
-        binding.userState.text = receiver.state
+
+        if (user.id == UID) {
+            binding.chatUsername.text = "Favourites"
+            Picasso.get().load(R.drawable.ic_favourite).fit().into(binding.chatUserPhoto)
+            binding.chatUsername.textSize = 24f
+            binding.userState.visibility = View.GONE
+        } else {
+            binding.chatUserPhoto.downloadAndSetImage(receiver.photoUrl)
+            binding.chatUsername.text = receiver.name
+            binding.userState.text = receiver.state
+        }
+
         binding.chatInputMessage.isCursorVisible = true
         CoroutineScope(Dispatchers.IO).launch {
             binding.btnVoiceMessage.setOnTouchListener { view, motionEvent ->
-                if(isPermissionGranted){
-                    if(motionEvent.action == MotionEvent.ACTION_DOWN){
+                if (isRecordAudioPermissionGranted) {
+                    if (motionEvent.action == MotionEvent.ACTION_DOWN) {
                         binding.chatInputMessage.setText("Recording...")
                         binding.btnVoiceMessage.setColorFilter(
-                            ContextCompat.getColor(requireActivity(),R.color.colorPrimary)
+                            ContextCompat.getColor(requireActivity(), R.color.colorPrimary)
                         )
                         val messageKey =
-                            REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(contact.id)
+                            REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(user.id)
                                 .push().key.toString()
                         voiceRecorder.startRecord(messageKey)
-                    }else if(motionEvent.action == MotionEvent.ACTION_UP){
+                    } else if (motionEvent.action == MotionEvent.ACTION_UP) {
                         binding.chatInputMessage.setText("")
                         binding.btnVoiceMessage.colorFilter = null
-                        voiceRecorder.stopRecord(){ file, messageKey ->
-                            uploadFileToStorage(Uri.fromFile(file),messageKey,contact.id, TYPE_VOICE)
+                        voiceRecorder.stopRecord() { file, messageKey ->
+                            Log.d("voice",file.length().toString())
+                            uploadFileToStorage(
+                                Uri.fromFile(file),
+                                messageKey,
+                                user.id,
+                                TYPE_VOICE
+                            )
                         }
                     }
 
@@ -189,12 +213,14 @@ class SingleChatFragment : Fragment() {
             }
         }
 
-        binding.btnAttachFile.setOnClickListener { attachFile() }
+        binding.btnAttach.setOnClickListener { attach() }
+
         binding.btnSendMessage.setOnClickListener {
+            saveToChatList(user.id, TYPE_SINGLE_CHAT)
             recyclerView.smoothScrollToPosition(adapter.itemCount)
             val message = binding.chatInputMessage.text.toString().trim()
             if (message.isNotEmpty()) {
-                sendMessage(message, contact.id, TYPE_TEXT) {
+                sendMessage(message, user.id, TYPE_TEXT) {
                     binding.chatInputMessage.setText("")
                 }
             }
@@ -205,7 +231,41 @@ class SingleChatFragment : Fragment() {
         }
     }
 
+    private fun saveToChatList(id: String, type: String) {
+        val refUser = "$NODE_SINGLE_CHAT/$UID/$id"
+        val refReceiver = "$NODE_SINGLE_CHAT/$id/$UID"
+
+        val mapUser = hashMapOf<String, Any>()
+        val mapReceiver = hashMapOf<String, Any>()
+
+        mapUser[CHILD_ID] = id
+        mapUser[CHILD_TYPE] = type
+
+        mapReceiver[CHILD_ID] = UID
+        mapReceiver[CHILD_TYPE] = type
+
+        val commonMap = hashMapOf<String, Any>()
+        commonMap[refUser] = mapUser
+        commonMap[refReceiver] = mapReceiver
+
+        REF_DATABASE_ROOT.updateChildren(commonMap)
+            .addOnFailureListener { showToast(it.message.toString()) }
+    }
+
+    private fun attach() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        binding.btnAttachFile.setOnClickListener { attachFile() }
+        binding.btnAttachImage.setOnClickListener { attachImage() }
+
+    }
+
     private fun attachFile() {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "*/*"
+        startActivityForResult(intent, REQUEST_CODE)
+    }
+
+    private fun attachImage() {
         CropImage.activity()
             .setAspectRatio(1, 1)
             .setRequestedSize(300, 400)
@@ -223,13 +283,13 @@ class SingleChatFragment : Fragment() {
 
             override fun afterTextChanged(str: Editable?) {
                 val string = str.toString()
-                if (string.isEmpty() || string=="Recording...") {
+                if (string.isEmpty() || string == "Recording...") {
                     binding.btnSendMessage.visibility = View.GONE
                     binding.btnAttachFile.visibility = View.VISIBLE
                     binding.btnVoiceMessage.visibility = View.VISIBLE
                 } else {
                     binding.btnSendMessage.visibility = View.VISIBLE
-                    binding.btnAttachFile.visibility = View.GONE
+                    binding.btnAttach.visibility = View.GONE
                     binding.btnVoiceMessage.visibility = View.GONE
                 }
             }
@@ -275,7 +335,7 @@ class SingleChatFragment : Fragment() {
     }
 
     private fun getReceiver(function: (snapshot: DataSnapshot) -> Unit) {
-        REF_DATABASE_ROOT.child(NODE_USERS).child(contact.id)
+        REF_DATABASE_ROOT.child(NODE_USERS).child(user.id)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     function(snapshot)
@@ -288,7 +348,7 @@ class SingleChatFragment : Fragment() {
     }
 
     private fun getReceiverId(function: (snapshot: DataSnapshot) -> Unit) {
-        REF_DATABASE_ROOT.child(NODE_USERS_ID).child(contact.id)
+        REF_DATABASE_ROOT.child(NODE_USERS_ID).child(user.id)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     function(snapshot)
@@ -301,31 +361,93 @@ class SingleChatFragment : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE
-            && resultCode == Activity.RESULT_OK && data != null
-        ) {
-            val uri = CropImage.getActivityResult(data).uri
-            val messageKey =
-                REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(contact.id)
-                    .push().key.toString()
-            uploadFileToStorage(uri,messageKey,contact.id, TYPE_IMAGE)
-            isNeedSmoothScroll = true
+        if (data == null) {
+            return
+        }
+        when (requestCode) {
+            CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
+                val uri = CropImage.getActivityResult(data).uri
+                val messageKey =
+                    REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(user.id)
+                        .push().key.toString()
+                uploadFileToStorage(uri, messageKey, user.id, TYPE_IMAGE)
+                isNeedSmoothScroll = true
+            }
+            REQUEST_CODE -> {
+                val uri = data.data
+                val messageKey =
+                    REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(user.id)
+                        .push().key.toString()
+                uri?.let {
+                    val filename = getFilenameFromUri(uri)
+                    uploadFileToStorage(uri, messageKey, user.id, TYPE_FILE, filename)
+                }
+                isNeedSmoothScroll = true
+            }
+        }
+
+    }
+
+    private fun getFilenameFromUri(uri: Uri): String {
+        var filename = ""
+        val cursor = requireActivity().contentResolver.query(uri, null, null, null, null)
+        try {
+            if (cursor != null && cursor.moveToNext()) {
+                filename =
+                    cursor.getString(cursor.getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME))
+            }
+        } catch (e: Exception) {
+            showToast(e.message.toString())
+        } finally {
+            cursor?.close()
+            return filename
         }
     }
 
 
     private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            isPermissionGranted = true
-        } else {
-            showToast("Permission denied")
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        permissions.entries.forEach {
+            when (it.key) {
+                android.Manifest.permission.RECORD_AUDIO -> {
+                    if (it.value) {
+                        isRecordAudioPermissionGranted = true
+                    } else {
+                        showToast("We cant record audio,permission denied")
+                    }
+                }
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                    if (it.value) {
+                        AppPermissions.isWriteStoragePermissionGranted = true
+                    } else {
+                        showToast("We cant write storage,permission denied")
+                    }
+                }
+                android.Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                    if (it.value) {
+                        AppPermissions.isReadStoragePermissionGranted = true
+                    } else {
+                        showToast("We cant write storage,permission denied")
+                    }
+                }
+            }
         }
+
     }
 
     private fun startRecordAudioPermissionRequest() {
-        requestPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+        requestPermissionLauncher.launch(
+            arrayOf(
+                android.Manifest.permission.RECORD_AUDIO,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        )
+    }
+
+    companion object {
+        private const val REQUEST_CODE = 100
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.clonegram.presentation.singleChat.singleChatAdapter
 
+import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clonegram.presentation.singleChat.singleChatAdapter.messageRecyclerView.viewHolders.*
@@ -15,6 +16,7 @@ class SingleChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
         (holder as MessageHolder).drawMessage(listMessagesCache[position])
     }
 

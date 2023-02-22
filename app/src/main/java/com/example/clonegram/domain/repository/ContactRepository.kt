@@ -1,12 +1,11 @@
 package com.example.clonegram.domain.repository
 
 import androidx.lifecycle.LiveData
-import com.example.clonegram.data.local.models.ContactDbModel
-import com.example.clonegram.domain.models.Contact
+import com.example.clonegram.domain.models.UserInfo
 
 interface ContactRepository {
 
-    fun getContactList(): LiveData<List<Contact>>
+    fun getContactList(): LiveData<List<UserInfo>>
 
-    suspend fun insertContact(contact: Contact)
+    fun insertContactList(contacts : ArrayList<UserInfo>)
 }

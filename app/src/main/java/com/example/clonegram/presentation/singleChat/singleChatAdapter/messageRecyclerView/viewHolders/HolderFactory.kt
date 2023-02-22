@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewParent
 import androidx.recyclerview.widget.RecyclerView
+import com.example.clonegram.databinding.MessageItemFileBinding
 import com.example.clonegram.databinding.MessageItemImageBinding
 import com.example.clonegram.databinding.MessageItemTextBinding
 import com.example.clonegram.databinding.MessageItemVoiceBinding
@@ -27,6 +28,11 @@ class HolderFactory {
                     val binding =
                         MessageItemVoiceBinding.inflate(LayoutInflater.from(parent.context), parent, false)
                     VoiceMessageHolder(binding)
+                }
+                MessageView.MESSAGE_FILE ->  {
+                    val binding =
+                        MessageItemFileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                    FileMessageHolder(binding)
                 }
                 else ->{
                     val binding =

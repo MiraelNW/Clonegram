@@ -28,7 +28,7 @@
     </fragment>
     <fragment
         android:id="@+id/chatsFragment"
-        android:name="com.example.clonegram.presentation.ChatsFragment"
+        android:name="com.example.clonegram.presentation.chats.ChatsFragment"
         android:label="chats_fragment"
         tools:layout="@layout/chats_fragment" >
         <action
@@ -39,6 +39,9 @@
             android:id="@+id/action_chatsFragment_to_contactsFragment"
             app:destination="@id/contactsFragment"
             app:popUpTo="@id/chatsFragment" />
+        <action
+            android:id="@+id/action_chatsFragment_to_singleChatFragment"
+            app:destination="@id/singleChatFragment" />
     </fragment>
     <fragment
         android:id="@+id/enterCodeFragment"
@@ -117,7 +120,7 @@
         android:label="single_chat_fragment"
         tools:layout="@layout/single_chat_fragment" >
         <argument
-            android:name="contact"
-            app:argType="com.example.clonegram.domain.models.Contact" />
+            android:name="userInfo"
+            app:argType="com.example.clonegram.domain.models.UserInfo" />
     </fragment>
 </navigation>

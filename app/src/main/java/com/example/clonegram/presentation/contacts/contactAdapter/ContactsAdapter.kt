@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.clonegram.databinding.ContactItemBinding
-import com.example.clonegram.domain.models.Contact
+import com.example.clonegram.domain.models.UserInfo
 import com.example.clonegram.utils.downloadAndSetImage
 
-class ContactsAdapter : ListAdapter<Contact, ContactsViewHolder>(ContactsDiffCallback) {
+class ContactsAdapter : ListAdapter<UserInfo, ContactsViewHolder>(ContactsDiffCallback) {
 
     var onContactClickListener : OnContactClickListener? = null
 
@@ -33,6 +33,6 @@ class ContactsAdapter : ListAdapter<Contact, ContactsViewHolder>(ContactsDiffCal
     }
 
     interface OnContactClickListener{
-        fun onContactClick(contact: Contact)
+        fun onContactClick(contact: UserInfo)
     }
 }

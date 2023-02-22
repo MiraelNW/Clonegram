@@ -1,24 +1,31 @@
-package com.example.clonegram.presentation
+package com.example.clonegram.presentation.chats
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.ChatsFragmentBinding
-import com.example.clonegram.presentation.contacts.ContactsFragment
-import com.example.clonegram.presentation.settings.SettingsFragment
-import com.example.clonegram.utils.USER
-import com.example.clonegram.utils.UserState
-import com.example.clonegram.utils.downloadAndSetImage
+import com.example.clonegram.domain.models.UserInfo
+import com.example.clonegram.presentation.singleChat.singleChatAdapter.SingleChatAdapter
+import com.example.clonegram.utils.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -29,6 +36,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import com.mikepenz.materialdrawer.util.AbstractDrawerImageLoader
 import com.mikepenz.materialdrawer.util.DrawerImageLoader
+import javax.inject.Inject
 
 class ChatsFragment : Fragment() {
 
@@ -36,9 +44,16 @@ class ChatsFragment : Fragment() {
         (requireActivity().application as ClonegramApp).component
     }
 
+    @Inject
+    lateinit var factory: ViewModelFactory
+    private lateinit var viewModel : ChatsViewModel
+
+
     private lateinit var drawer: Drawer
     private lateinit var header: AccountHeader
     private lateinit var drawerLayout: DrawerLayout
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: SingleChatsAdapter
 
     private var _binding: ChatsFragmentBinding? = null
     private val binding: ChatsFragmentBinding
@@ -60,6 +75,8 @@ class ChatsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this,factory)[ChatsViewModel::class.java]
+        startLocationPermissionRequest()
         UserState.updateState(UserState.ONLINE)
         createMenu()
     }
@@ -67,6 +84,77 @@ class ChatsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         updateMenu()
+        initRecycleView()
+    }
+
+    private fun initRecycleView() {
+        recyclerView = binding.singleChatRecyclerView
+        adapter = SingleChatsAdapter()
+        recyclerView.adapter = adapter
+        getChatsList().observe(this) { list ->
+            adapter.submitList(list)
+            adapter.onChatClickListener = object : SingleChatsAdapter.OnChatClickListener {
+                override fun onChatClick(user: UserInfo) {
+                    findNavController().navigate(
+                        ChatsFragmentDirections.actionChatsFragmentToSingleChatFragment(
+                            user
+                        )
+                    )
+                }
+            }
+        }
+    }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            requestContacts()
+        } else {
+            showToast("we cant see contacts,permission denied")
+            requireActivity().finish()
+        }
+    }
+
+    private fun startLocationPermissionRequest() {
+        requestPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS)
+    }
+
+    private fun requestContacts(){
+        val arrayContacts = arrayListOf<UserInfo>()
+        val cursor = requireActivity().contentResolver.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            null,
+            null,
+            null,
+            null
+        )
+        cursor?.let {
+            while (cursor.moveToNext()) {
+                val name = cursor
+                    .getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
+                val id = cursor
+                    .getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                var phone = cursor
+                    .getString(cursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
+                val number = phone.replace(Regex("-"), "").replace(Regex(" "), "")
+                phone = number.substring(0, 2) + " (" +
+                        number.substring(2, 5) + ") " +
+                        number.substring(5, 8) + " " +
+                        number.substring(8, 10) + " " +
+                        number.substring(10, 12)
+                if (phone != USER.phone) {
+                    val contact = UserInfo(
+                        id = id,
+                        name = name,
+                        phone = phone
+                    )
+
+                    arrayContacts.add(contact)
+                }
+            }
+        }
+        viewModel.insertContactListUseCase(arrayContacts)
+        cursor?.close()
     }
 
     private fun updateMenu() {
@@ -78,7 +166,7 @@ class ChatsFragment : Fragment() {
         header.updateProfile(profileItem)
     }
 
-    private fun createMenu(){
+    private fun createMenu() {
         initLoader()
         createHeader()
         createDrawer()
@@ -155,7 +243,7 @@ class ChatsFragment : Fragment() {
                     position: Int,
                     drawerItem: IDrawerItem<*>
                 ): Boolean {
-                    findNavController().navigate(loadFragment(drawerItem.identifier.toInt()))
+                    loadFragment(drawerItem.identifier.toInt())
                     disableDrawer()
                     return false
                 }
@@ -164,29 +252,36 @@ class ChatsFragment : Fragment() {
             .build()
     }
 
-    private fun loadFragment(position : Int):Int{
-        return when(position){
-            105 -> {
-              R.id.action_chatsFragment_to_settingsFragment
+    private fun loadFragment(position: Int) {
+        when (position) {
+            IDENTIFIER_SETTINGS.toInt() -> {
+                findNavController().navigate(R.id.action_chatsFragment_to_settingsFragment)
             }
-            101 -> {
-                R.id.action_chatsFragment_to_contactsFragment
+            IDENTIFIER_CONTACTS.toInt() -> {
+                findNavController().navigate(R.id.action_chatsFragment_to_contactsFragment)
+            }
+            IDENTIFIER_FAVOURITES.toInt() -> {
+                findNavController().navigate(
+                    ChatsFragmentDirections.actionChatsFragmentToSingleChatFragment(
+                        USER
+                    )
+                )
             }
             else -> {
-               0
+                findNavController().navigate(R.id.action_chatsFragment_to_settingsFragment)
             }
         }
     }
 
-    private fun initLoader(){
-        DrawerImageLoader.init(object : AbstractDrawerImageLoader(){
+    private fun initLoader() {
+        DrawerImageLoader.init(object : AbstractDrawerImageLoader() {
             override fun set(imageView: ImageView, uri: Uri, placeholder: Drawable) {
                 imageView.downloadAndSetImage(uri.toString())
             }
         })
     }
 
-    private fun disableDrawer(){
+    private fun disableDrawer() {
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
     }
 

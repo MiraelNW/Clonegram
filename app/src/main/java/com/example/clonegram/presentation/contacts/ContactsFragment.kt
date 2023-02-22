@@ -2,6 +2,7 @@ package com.example.clonegram.presentation.contacts
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
-import com.example.clonegram.R
 import com.example.clonegram.databinding.ContactsFragmentBinding
-import com.example.clonegram.domain.models.Contact
+import com.example.clonegram.domain.models.UserInfo
 import com.example.clonegram.presentation.contacts.contactAdapter.ContactsAdapter
-import com.example.clonegram.presentation.singleChat.SingleChatFragment
 import com.example.clonegram.utils.ViewModelFactory
 import javax.inject.Inject
 
@@ -53,8 +52,13 @@ class ContactsFragment : Fragment() {
 
         val adapter = ContactsAdapter()
         binding.contactsRecyclerView.adapter = adapter
+
+        viewModel.contactListUseCase.invoke().observe(viewLifecycleOwner){
+            adapter.submitList(it)
+        }
+
         adapter.onContactClickListener = object : ContactsAdapter.OnContactClickListener {
-            override fun onContactClick(contact: Contact) {
+            override fun onContactClick(contact: UserInfo) {
                 findNavController().navigate(
                     ContactsFragmentDirections.actionContactsFragmentToSingleChatFragment(
                         contact
@@ -63,12 +67,12 @@ class ContactsFragment : Fragment() {
             }
 
         }
-        viewModel.contactList().observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
+
         binding.arrowBack.setOnClickListener { findNavController().popBackStack() }
 
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

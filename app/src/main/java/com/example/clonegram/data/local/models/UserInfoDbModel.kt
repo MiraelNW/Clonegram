@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "Contacts")
-data class ContactDbModel(
+data class UserInfoDbModel(
     @PrimaryKey
     val id: String,
     val name: String,

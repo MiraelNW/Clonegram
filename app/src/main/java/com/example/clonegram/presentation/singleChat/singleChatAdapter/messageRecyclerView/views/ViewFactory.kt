@@ -2,6 +2,7 @@ package com.example.clonegram.presentation.singleChat.singleChatAdapter.messageR
 
 import android.util.Log
 import com.example.clonegram.domain.models.UserInfo
+import com.example.clonegram.utils.TYPE_FILE
 import com.example.clonegram.utils.TYPE_IMAGE
 import com.example.clonegram.utils.TYPE_TEXT
 import com.example.clonegram.utils.TYPE_VOICE
@@ -24,6 +25,15 @@ class ViewFactory {
                         message.from,
                         message.timeStamp.toString(),
                         message.fileUrl
+                    )
+                }
+                TYPE_FILE -> {
+                    ViewFileMessage(
+                        message.id,
+                        message.from,
+                        message.timeStamp.toString(),
+                        message.fileUrl,
+                        message.text
                     )
                 }
                 else ->{

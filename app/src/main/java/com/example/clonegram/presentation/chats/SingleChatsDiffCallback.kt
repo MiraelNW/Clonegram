@@ -1,14 +1,14 @@
-package com.example.clonegram.presentation.contacts.contactAdapter
+package com.example.clonegram.presentation.chats
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.clonegram.domain.models.UserInfo
 
-object ContactsDiffCallback : DiffUtil.ItemCallback<UserInfo>() {
+object SingleChatsDiffCallback  : DiffUtil.ItemCallback<UserInfo>(){
     override fun areItemsTheSame(oldItem: UserInfo, newItem: UserInfo): Boolean {
-        return oldItem.id == newItem.id
+       return oldItem.lastMessage == newItem.lastMessage
     }
 
     override fun areContentsTheSame(oldItem: UserInfo, newItem: UserInfo): Boolean {
-        return oldItem == newItem
+       return oldItem == newItem
     }
 }

@@ -2,7 +2,7 @@ package com.example.clonegram.di
 
 import android.app.Application
 import com.example.clonegram.ClonegramApp
-import com.example.clonegram.presentation.ChatsFragment
+import com.example.clonegram.presentation.chats.ChatsFragment
 import com.example.clonegram.presentation.MainActivity
 import com.example.clonegram.presentation.MainFragment
 import com.example.clonegram.presentation.authentication.EnterCodeFragment

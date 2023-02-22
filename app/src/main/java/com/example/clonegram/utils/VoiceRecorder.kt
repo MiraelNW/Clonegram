@@ -1,5 +1,6 @@
 package com.example.clonegram.utils
 
+import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import android.widget.Toast
@@ -53,11 +54,13 @@ class VoiceRecorder {
     private fun prepareMediaRecorder() {
         mediaRecorder.apply {
             reset()
-            setAudioSource(MediaRecorder.AudioSource.DEFAULT)
+            setAudioSource(MediaRecorder.AudioSource.VOICE_RECOGNITION)
+            setAudioSamplingRate(8000)
             setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
             setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
             setOutputFile(file.absolutePath)
             prepare()
+
         }
 
     }

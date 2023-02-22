@@ -4,10 +4,12 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
@@ -15,6 +17,7 @@ import com.example.clonegram.databinding.SettingsFragmentBinding
 import com.example.clonegram.utils.*
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
+import javax.inject.Inject
 
 class SettingsFragment : Fragment() {
 
@@ -25,6 +28,10 @@ class SettingsFragment : Fragment() {
     private var _binding: SettingsFragmentBinding? = null
     private val binding: SettingsFragmentBinding
         get() = _binding ?: throw RuntimeException("SettingsFragmentBinding is null")
+
+    @Inject
+    lateinit var factory: ViewModelFactory
+    private lateinit var viewModel: SettingsViewModel
 
     override fun onAttach(context: Context) {
         component.inject(this)
@@ -42,9 +49,10 @@ class SettingsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, factory)[SettingsViewModel::class.java]
 
         binding.arrowBack.setOnClickListener {
-           findNavController().popBackStack()
+            findNavController().popBackStack()
         }
         binding.settingsBtnChangeBio.setOnClickListener {
             findNavController().navigate(R.id.action_settingsFragment_to_changeBioFragment)
@@ -99,22 +107,15 @@ class SettingsFragment : Fragment() {
             && resultCode == RESULT_OK && data != null
         ) {
             val uri = CropImage.getActivityResult(data).uri
-            val path = REF_STORAGE_ROOT.child(FOLDER_PROFILE_IMAGE)
-                .child(UID)
-            putFileToStorage(uri, path) {
-                getUrlFromStorage(path) {
-                    putUrlToDatabase(it) {
-                        USER.photoUrl = it
-                        binding.settingsUserPhoto.downloadAndSetImage(it)
-                        showToast("Your photo is saved")
-                    }
-                }
+            Log.d("avatar",uri.toString())
+            viewModel.insertImage(uri){
+                USER.photoUrl = uri.toString()
+                binding.settingsUserPhoto.downloadAndSetImage(uri.toString())
+                showToast("Your photo is saved")
             }
+
         }
     }
-
-
-
 
     override fun onDestroyView() {
         super.onDestroyView()
