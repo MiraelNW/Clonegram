@@ -1,6 +1,5 @@
-package com.example.clonegram.presentation.chats
+package com.example.clonegram.presentation.chats.chatsRecyclerView
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter

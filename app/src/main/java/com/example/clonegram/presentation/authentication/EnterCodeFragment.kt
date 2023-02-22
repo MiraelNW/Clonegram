@@ -70,44 +70,19 @@ class EnterCodeFragment : Fragment() {
                 dateMap[CHILD_PHONE] = phoneNumber
                 val user = UserInfo(uid, phone = phoneNumber)
                 UID = uid
-                REF_DATABASE_ROOT.child(NODE_PHONES_NUMBER).child(phoneNumber).setValue(uid)
-                    .addOnSuccessListener {
-                        REF_DATABASE_ROOT.child(NODE_USERS).child(uid).updateChildren(dateMap)
-                            .addOnSuccessListener {
-                                showToast("Welcome to the Clonegram")
-                                initUser {
-                                    lifecycleScope.launch {
-                                        viewModel.insertUserUseCase(user)
-                                    }
-                                    startChatFragment()
-                                }
-                            }
-                            .addOnFailureListener { showToast(it.message.toString()) }
+                viewModel.firstInitUserUseCase(phoneNumber, uid, dateMap) {
+                    showToast("Welcome to the Clonegram")
+                    lifecycleScope.launch {
+                        viewModel.insertUserUseCase(user)
                     }
-                    .addOnFailureListener { showToast(it.message.toString()) }
+                    startChatFragment()
+                }
             }
         }
     }
 
-    private fun initUser(function: () -> Unit) {
-        REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    USER = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
-                    if(USER.idName.isEmpty()){
-                        USER.idName = USER.id
-                        REF_DATABASE_ROOT.child(NODE_USERS_ID).child(USER.id).setValue(USER.id)
-                    }
-                    function()
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                }
-            })
-    }
-
     private fun startChatFragment() {
-       findNavController().navigate(R.id.action_enterCodeFragment_to_mainFragment2)
+        findNavController().navigate(R.id.action_enterCodeFragment_to_mainFragment2)
     }
 
     override fun onDestroyView() {

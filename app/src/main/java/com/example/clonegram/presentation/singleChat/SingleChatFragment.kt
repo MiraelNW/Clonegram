@@ -1,6 +1,7 @@
 package com.example.clonegram.presentation.singleChat
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,11 +17,13 @@ import android.widget.AbsListView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.SingleChatFragmentBinding
 import com.example.clonegram.domain.models.UserInfo
@@ -34,6 +37,7 @@ import com.theartofdev.edmodo.cropper.CropImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class SingleChatFragment : Fragment() {
 
@@ -57,9 +61,22 @@ class SingleChatFragment : Fragment() {
     private val binding: SingleChatFragmentBinding
         get() = _binding ?: throw RuntimeException("SingleChatFragmentBinding is null")
 
+    @Inject
+    lateinit var factory: ViewModelFactory
+    private lateinit var viewModel : SingleChatViewModel
+
     private val args by navArgs<SingleChatFragmentArgs>()
     private val user by lazy {
         args.userInfo
+    }
+
+    private val component by lazy{
+        (requireActivity().application as ClonegramApp).component
+    }
+
+    override fun onAttach(context: Context) {
+        component.inject(this)
+        super.onAttach(context)
     }
 
     override fun onCreateView(
@@ -74,6 +91,7 @@ class SingleChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         startRecordAudioPermissionRequest()
+        viewModel = ViewModelProvider(this,factory)[SingleChatViewModel::class.java]
     }
 
     override fun onResume() {
@@ -198,7 +216,6 @@ class SingleChatFragment : Fragment() {
                         binding.chatInputMessage.setText("")
                         binding.btnVoiceMessage.colorFilter = null
                         voiceRecorder.stopRecord() { file, messageKey ->
-                            Log.d("voice",file.length().toString())
                             uploadFileToStorage(
                                 Uri.fromFile(file),
                                 messageKey,
@@ -216,11 +233,11 @@ class SingleChatFragment : Fragment() {
         binding.btnAttach.setOnClickListener { attach() }
 
         binding.btnSendMessage.setOnClickListener {
-            saveToChatList(user.id, TYPE_SINGLE_CHAT)
+            viewModel.saveToChatList(user.id, TYPE_SINGLE_CHAT)
             recyclerView.smoothScrollToPosition(adapter.itemCount)
             val message = binding.chatInputMessage.text.toString().trim()
             if (message.isNotEmpty()) {
-                sendMessage(message, user.id, TYPE_TEXT) {
+                viewModel.sendMessage(message,user.id, TYPE_TEXT){
                     binding.chatInputMessage.setText("")
                 }
             }
@@ -231,26 +248,7 @@ class SingleChatFragment : Fragment() {
         }
     }
 
-    private fun saveToChatList(id: String, type: String) {
-        val refUser = "$NODE_SINGLE_CHAT/$UID/$id"
-        val refReceiver = "$NODE_SINGLE_CHAT/$id/$UID"
 
-        val mapUser = hashMapOf<String, Any>()
-        val mapReceiver = hashMapOf<String, Any>()
-
-        mapUser[CHILD_ID] = id
-        mapUser[CHILD_TYPE] = type
-
-        mapReceiver[CHILD_ID] = UID
-        mapReceiver[CHILD_TYPE] = type
-
-        val commonMap = hashMapOf<String, Any>()
-        commonMap[refUser] = mapUser
-        commonMap[refReceiver] = mapReceiver
-
-        REF_DATABASE_ROOT.updateChildren(commonMap)
-            .addOnFailureListener { showToast(it.message.toString()) }
-    }
 
     private fun attach() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -298,6 +296,12 @@ class SingleChatFragment : Fragment() {
 
     }
 
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
     private fun sendMessage(
         message: String,
         receivingUserId: String,
@@ -403,6 +407,14 @@ class SingleChatFragment : Fragment() {
             return filename
         }
     }
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
 
 
     private val requestPermissionLauncher = registerForActivityResult(

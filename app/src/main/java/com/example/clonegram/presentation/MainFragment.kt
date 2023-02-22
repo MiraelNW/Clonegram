@@ -33,6 +33,10 @@ class MainFragment : Fragment() {
     private val binding: MainFragmentBinding
         get() = _binding ?: throw RuntimeException("MainFragmentBinding is null")
 
+    @Inject
+    lateinit var factory: ViewModelFactory
+    private lateinit var viewModel: MainViewModel
+
     override fun onAttach(context: Context) {
         component.inject(this)
         super.onAttach(context)
@@ -49,10 +53,11 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
         if (AUTH.currentUser == null) {
             findNavController().navigate(R.id.action_mainFragment2_to_startCommunicationFragment2)
         } else {
-            initUser() {
+            viewModel.initUserUseCase() {
                 findNavController().navigate(R.id.action_mainFragment2_to_chatsFragment)
             }
         }
@@ -62,20 +67,5 @@ class MainFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
-    private fun initUser(function: () -> Unit) {
-        REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    USER = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
-                    function()
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                }
-            })
-    }
-
-
 
 }

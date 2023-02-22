@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.SettingsFragmentBinding
+import com.example.clonegram.presentation.settings.viewModels.SettingsViewModel
 import com.example.clonegram.utils.*
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
@@ -61,7 +61,6 @@ class SettingsFragment : Fragment() {
             findNavController().navigate(R.id.action_settingsFragment_to_changeUserIdFragment)
         }
         binding.settingsBtnChangeNumberPhone.setOnClickListener {
-            //TODO()
         }
         binding.settingsChangePhoto.setOnClickListener {
             changeUserPhoto()
@@ -107,8 +106,7 @@ class SettingsFragment : Fragment() {
             && resultCode == RESULT_OK && data != null
         ) {
             val uri = CropImage.getActivityResult(data).uri
-            Log.d("avatar",uri.toString())
-            viewModel.insertImage(uri){
+            viewModel.insertImage(uri).observe(viewLifecycleOwner){
                 USER.photoUrl = uri.toString()
                 binding.settingsUserPhoto.downloadAndSetImage(uri.toString())
                 showToast("Your photo is saved")

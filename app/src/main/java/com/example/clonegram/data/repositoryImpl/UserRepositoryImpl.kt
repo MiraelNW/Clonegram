@@ -28,15 +28,34 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun insertImage(uri: Uri, function: (String) -> Unit){
-        val path = REF_STORAGE_ROOT.child(FOLDER_PROFILE_IMAGE)
-            .child(UID)
-        putFileToStorage(uri, path) {
-            getUrlFromStorage(path) {
-                 putUrlToDatabase(it){
-
-                 }
-            }
-        }
+    override fun insertImage(uri: Uri):LiveData<String>{
+        return getImageUrl(uri)
     }
+
+    override fun changeNameId(userId: String,function:()->Unit) {
+        function()
+        changeId(userId)
+    }
+
+    override fun changeName(name: String, function: () -> Unit) {
+       changeUserName(name,function)
+    }
+
+    override fun changeBio(bio: String, function: () -> Unit) {
+        changeFirebaseBio(bio,function)
+    }
+
+    override fun initUser(function: () -> Unit) {
+       initFirebaseUser(function)
+    }
+
+    override fun updateChildren(commonMap: HashMap<String, Any>,function: () -> Unit) {
+        updateFirebaseChildren(commonMap,function)
+    }
+
+    override fun firstInitUser(phoneNumber:String,uid:String,dateMap:Map<String,Any>,function: () -> Unit) {
+        firstUploadUser(phoneNumber, uid, dateMap, function)
+
+    }
+
 }

@@ -2,14 +2,18 @@ package com.example.clonegram.presentation.settings
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.databinding.ChangeUserIdFragmentBinding
+import com.example.clonegram.presentation.settings.viewModels.ChangeUserIdViewModel
 import com.example.clonegram.utils.*
+import javax.inject.Inject
 
 class ChangeUserIdFragment : Fragment() {
 
@@ -22,6 +26,10 @@ class ChangeUserIdFragment : Fragment() {
     private var _binding: ChangeUserIdFragmentBinding? = null
     private val binding: ChangeUserIdFragmentBinding
         get() = _binding ?: throw RuntimeException("ChangeUserIdFragmentBinding is null")
+
+    @Inject
+    lateinit var factory: ViewModelFactory
+    private lateinit var viewModel: ChangeUserIdViewModel
 
     override fun onAttach(context: Context) {
         component.inject(this)
@@ -39,57 +47,22 @@ class ChangeUserIdFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, factory)[ChangeUserIdViewModel::class.java]
         binding.etUserId.setText(USER.idName)
-        binding.arrowBack.setOnClickListener {
-            findNavController().popBackStack()
-
-        }
+        binding.arrowBack.setOnClickListener { findNavController().popBackStack() }
         binding.accept.setOnClickListener {
             userId = binding.etUserId.text.toString().trim()
             if (userId.isEmpty()) {
                 showToast("This field should not be empty")
             } else {
-                changeId()
-            }
-
-        }
-    }
-
-
-    private fun changeId() {
-        REF_DATABASE_ROOT.child(NODE_USERS_ID).child(userId).setValue(UID)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    updateCurrentUserId()
-                } else {
-                    showToast(it.exception?.message ?: "")
-                }
-            }
-    }
-
-    private fun updateCurrentUserId() {
-        REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_ID_NAME).setValue(userId)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    deleteOldUserId()
-                } else {
-                    showToast(it.exception?.message ?: "")
-                }
-            }
-    }
-
-    private fun deleteOldUserId() {
-        REF_DATABASE_ROOT.child(NODE_USERS_ID).child(USER.idName).removeValue()
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
+                viewModel.changeUserIdUseCase(userId) {
+                    Log.d("tag","log")
                     showToast("Your id is saved")
                     USER.idName = userId
                     findNavController().popBackStack()
-                } else {
-                    showToast(it.exception?.message ?: "")
                 }
-
             }
+        }
     }
 
     override fun onDestroyView() {

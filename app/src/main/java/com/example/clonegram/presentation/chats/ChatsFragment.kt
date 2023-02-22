@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,18 +13,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.R
 import com.example.clonegram.databinding.ChatsFragmentBinding
 import com.example.clonegram.domain.models.UserInfo
-import com.example.clonegram.presentation.singleChat.singleChatAdapter.SingleChatAdapter
+import com.example.clonegram.presentation.chats.chatsRecyclerView.SingleChatsAdapter
 import com.example.clonegram.utils.*
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer

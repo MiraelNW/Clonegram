@@ -1,4 +1,4 @@
-package com.example.clonegram.presentation.chats
+package com.example.clonegram.presentation.chats.chatsRecyclerView
 
 import androidx.recyclerview.widget.DiffUtil
 import com.example.clonegram.domain.models.UserInfo

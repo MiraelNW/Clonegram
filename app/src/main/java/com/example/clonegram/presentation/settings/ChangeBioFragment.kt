@@ -8,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.clonegram.ClonegramApp
 import com.example.clonegram.databinding.ChangeBioFragmentBinding
+import com.example.clonegram.presentation.settings.viewModels.ChangeBioViewModel
 import com.example.clonegram.utils.*
+import javax.inject.Inject
 
 class ChangeBioFragment : Fragment() {
 
@@ -22,6 +25,10 @@ class ChangeBioFragment : Fragment() {
     private var _binding: ChangeBioFragmentBinding? = null
     private val binding: ChangeBioFragmentBinding
         get() = _binding ?: throw RuntimeException("ChangeBioFragmentBinding is null")
+
+    @Inject
+    lateinit var factory: ViewModelFactory
+    private lateinit var viewModel: ChangeBioViewModel
 
     override fun onAttach(context: Context) {
         component.inject(this)
@@ -39,10 +46,11 @@ class ChangeBioFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this, factory)[ChangeBioViewModel::class.java]
         binding.etAboutYourself.setText(USER.bio)
         changeBio()
         binding.arrowBack.setOnClickListener {
-           findNavController().popBackStack()
+            findNavController().popBackStack()
 
         }
         binding.accept.setOnClickListener {
@@ -84,14 +92,11 @@ class ChangeBioFragment : Fragment() {
     private fun saveBio() {
         val bio = binding.etAboutYourself.text.toString().trim()
         if (bio.isNotEmpty()) {
-            REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_BIO).setValue(bio)
-                .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        showToast("Your bio is saved")
-                        USER.bio = bio
-                        findNavController().popBackStack()
-                    }
-                }
+            viewModel.changeBioUseCase(bio) {
+                showToast("Your bio is saved")
+                USER.bio = bio
+                findNavController().popBackStack()
+            }
         } else {
             USER.bio = DEFAULT_BIO
             findNavController().popBackStack()

@@ -1,4 +1,4 @@
-package com.example.clonegram.presentation.chats
+package com.example.clonegram.presentation.chats.chatsRecyclerView
 
 import androidx.recyclerview.widget.RecyclerView
 import com.example.clonegram.databinding.SingleChatItemBinding

@@ -4,6 +4,8 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.example.clonegram.domain.models.UserInfo
 import com.example.clonegram.presentation.MainActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -11,10 +13,12 @@ import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import kotlinx.coroutines.launch
 import java.io.File
 
 lateinit var APP_ACTIVITY: MainActivity
 private var chatsList = MutableLiveData<List<UserInfo>>()
+private var urlFromStorage = MutableLiveData<String>()
 
 lateinit var AUTH: FirebaseAuth
 lateinit var REF_DATABASE_ROOT: DatabaseReference
@@ -64,9 +68,91 @@ fun initFirebaseDatabase() {
     USER = UserInfo()
 }
 
-fun putUrlToDatabase(url: String,function: () -> Unit){
+fun changeFirebaseBio(bio: String, function: () -> Unit) {
+    REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_BIO).setValue(bio)
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+                function()
+            }
+        }
+}
+
+fun changeUserName(name: String, function: () -> Unit) {
+    REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_NAME).setValue(name)
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+                function()
+            }
+        }
+}
+
+fun getImageUrl(uri: Uri): LiveData<String> {
+
+    val path = REF_STORAGE_ROOT.child(FOLDER_PROFILE_IMAGE).child(UID)
+    putFileToStorage(uri, path) {
+        getUrlFromStorage(path) {
+            putUrlToDatabase(it) {
+                urlFromStorage.value = it
+            }
+        }
+    }
+    return urlFromStorage
+}
+
+fun initFirebaseUser(function: () -> Unit) {
+    REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
+        .addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                USER = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
+                function()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+}
+
+fun updateFirebaseChildren(commonMap: HashMap<String, Any>,function: () -> Unit) {
+    REF_DATABASE_ROOT.updateChildren(commonMap)
+        .addOnSuccessListener { function() }
+        .addOnFailureListener { showToast(it.message.toString()) }
+}
+
+fun firstUploadUser(
+    phoneNumber: String,
+    uid: String,
+    dateMap: Map<String, Any>,
+    function: () -> Unit
+) {
+    REF_DATABASE_ROOT.child(NODE_PHONES_NUMBER).child(phoneNumber).setValue(uid)
+        .addOnSuccessListener {
+            REF_DATABASE_ROOT.child(NODE_USERS).child(uid).updateChildren(dateMap)
+                .addOnSuccessListener {
+                    REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                USER = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
+                                if (USER.idName.isEmpty()) {
+                                    USER.idName = USER.id
+                                    REF_DATABASE_ROOT.child(NODE_USERS_ID).child(USER.id)
+                                        .setValue(USER.id)
+                                }
+                                function()
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                            }
+                        })
+                }
+                .addOnFailureListener { showToast(it.message.toString()) }
+        }
+        .addOnFailureListener { showToast(it.message.toString()) }
+}
+
+fun putUrlToDatabase(url: String, function: () -> Unit) {
     REF_DATABASE_ROOT.child(NODE_USERS).child(UID)
         .child(CHILD_PHOTO).setValue(url)
+        .addOnSuccessListener { function() }
         .addOnFailureListener { showToast(it.message.toString()) }
 
 }
@@ -151,7 +237,9 @@ fun getChatsList(): LiveData<List<UserInfo>> {
 }
 
 fun getAllChats(function: (userList: MutableList<UserInfo>) -> Unit) {
+
     val userList = mutableListOf<UserInfo>()
+
     refChatsList.addValueEventListener(object : ValueEventListener {
         override fun onDataChange(dataSnapshot: DataSnapshot) {
             val listUsers =
@@ -206,25 +294,52 @@ fun getAllChats(function: (userList: MutableList<UserInfo>) -> Unit) {
                                     }
 
                                     override fun onCancelled(error: DatabaseError) {}
-
                                 })
                         }
 
                         override fun onCancelled(error: DatabaseError) {}
-
                     })
             }
         }
 
         override fun onCancelled(error: DatabaseError) {}
-
     })
-
 }
 
-fun updatePhonesList(
-    arrayContacts: ArrayList<UserInfo>
-) {
+fun changeId(userId: String) {
+    REF_DATABASE_ROOT.child(NODE_USERS_ID).child(userId).setValue(UID)
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+                updateCurrentUserId(userId)
+            } else {
+                showToast(it.exception?.message ?: "")
+            }
+        }
+}
+
+private fun updateCurrentUserId(userId: String) {
+    REF_DATABASE_ROOT.child(NODE_USERS).child(UID).child(CHILD_ID_NAME).setValue(userId)
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+                deleteOldUserId()
+            } else {
+                showToast(it.exception?.message ?: "")
+            }
+        }
+}
+
+private fun deleteOldUserId() {
+    REF_DATABASE_ROOT.child(NODE_USERS_ID).child(USER.idName).removeValue()
+        .addOnCompleteListener {
+            if (it.isSuccessful) {
+
+            } else {
+                showToast(it.exception?.message ?: "")
+            }
+        }
+}
+
+fun updatePhonesList(arrayContacts: ArrayList<UserInfo>) {
     if (AUTH.currentUser != null) {
         REF_DATABASE_ROOT.child(NODE_PHONES_NUMBER)
             .addListenerForSingleValueEvent(object : ValueEventListener {

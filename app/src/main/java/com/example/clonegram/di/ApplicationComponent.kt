@@ -13,6 +13,7 @@ import com.example.clonegram.presentation.contacts.ContactsFragment
 import com.example.clonegram.presentation.settings.ChangeBioFragment
 import com.example.clonegram.presentation.settings.ChangeNameFragment
 import com.example.clonegram.presentation.settings.ChangeUserIdFragment
+import com.example.clonegram.presentation.singleChat.SingleChatFragment
 import dagger.BindsInstance
 import dagger.Component
 
@@ -30,6 +31,7 @@ interface ApplicationComponent {
     fun inject(fragment: EnterCodeFragment)
     fun inject(fragment: ChangeNameFragment)
     fun inject(fragment: MainFragment)
+    fun inject(fragment: SingleChatFragment)
     fun inject(app: ClonegramApp)
 
     @Component.Factory

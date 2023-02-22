@@ -1,4 +1,4 @@
-package com.example.clonegram.domain.usecases
+package com.example.clonegram.domain.usecases.user
 
 import com.example.clonegram.domain.repository.ContactRepository
 import com.example.clonegram.domain.repository.UserRepository
