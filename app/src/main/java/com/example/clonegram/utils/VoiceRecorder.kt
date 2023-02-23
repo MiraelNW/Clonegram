@@ -7,8 +7,9 @@ import android.widget.Toast
 import com.example.clonegram.presentation.MainActivity
 import java.io.File
 import java.lang.Exception
+import javax.inject.Inject
 
-class VoiceRecorder {
+class VoiceRecorder @Inject constructor() {
 
     private val mediaRecorder = MediaRecorder()
     private lateinit var file: File

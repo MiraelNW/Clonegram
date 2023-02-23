@@ -41,14 +41,11 @@ import javax.inject.Inject
 
 class SingleChatFragment : Fragment() {
 
-
-    private lateinit var receiver: UserInfo
     private lateinit var refMessages: DatabaseReference
     private lateinit var messageListener: ValueEventListener
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: SingleChatAdapter
     private lateinit var layoutManager: LinearLayoutManager
-    private lateinit var voiceRecorder: VoiceRecorder
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<*>
 
     private var countMessages = 20
@@ -63,14 +60,14 @@ class SingleChatFragment : Fragment() {
 
     @Inject
     lateinit var factory: ViewModelFactory
-    private lateinit var viewModel : SingleChatViewModel
+    private lateinit var viewModel: SingleChatViewModel
 
     private val args by navArgs<SingleChatFragmentArgs>()
     private val user by lazy {
         args.userInfo
     }
 
-    private val component by lazy{
+    private val component by lazy {
         (requireActivity().application as ClonegramApp).component
     }
 
@@ -91,16 +88,16 @@ class SingleChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         startRecordAudioPermissionRequest()
-        viewModel = ViewModelProvider(this,factory)[SingleChatViewModel::class.java]
+        viewModel = ViewModelProvider(this, factory)[SingleChatViewModel::class.java]
     }
 
     override fun onResume() {
         super.onResume()
         if (user.id == UID) {
-            initFields()
+            initFields(USER)
         } else {
-            initReceiver() {
-                initFields()
+            viewModel.initReceiverUseCase(user.id) {
+                initFields(it)
             }
         }
         initRecycler()
@@ -109,7 +106,7 @@ class SingleChatFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         // _binding = null
-        voiceRecorder.releaseRecorder()
+        viewModel.releaseRecorder()
         adapter.destroy()
         binding.rvSwipeRefresh.isEnabled = false
         refMessages.removeEventListener(messageListener)
@@ -181,11 +178,10 @@ class SingleChatFragment : Fragment() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun initFields() {
+    private fun initFields(receiver: UserInfo) {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetChoice)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         setVisibilityMode()
-        voiceRecorder = VoiceRecorder()
         layoutManager = LinearLayoutManager(requireContext())
 
         if (user.id == UID) {
@@ -200,6 +196,7 @@ class SingleChatFragment : Fragment() {
         }
 
         binding.chatInputMessage.isCursorVisible = true
+
         CoroutineScope(Dispatchers.IO).launch {
             binding.btnVoiceMessage.setOnTouchListener { view, motionEvent ->
                 if (isRecordAudioPermissionGranted) {
@@ -208,21 +205,11 @@ class SingleChatFragment : Fragment() {
                         binding.btnVoiceMessage.setColorFilter(
                             ContextCompat.getColor(requireActivity(), R.color.colorPrimary)
                         )
-                        val messageKey =
-                            REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(user.id)
-                                .push().key.toString()
-                        voiceRecorder.startRecord(messageKey)
+                        viewModel.startRecord(user.id)
                     } else if (motionEvent.action == MotionEvent.ACTION_UP) {
                         binding.chatInputMessage.setText("")
                         binding.btnVoiceMessage.colorFilter = null
-                        voiceRecorder.stopRecord() { file, messageKey ->
-                            uploadFileToStorage(
-                                Uri.fromFile(file),
-                                messageKey,
-                                user.id,
-                                TYPE_VOICE
-                            )
-                        }
+                        viewModel.stopRecord(user.id)
                     }
 
                 }
@@ -237,7 +224,7 @@ class SingleChatFragment : Fragment() {
             recyclerView.smoothScrollToPosition(adapter.itemCount)
             val message = binding.chatInputMessage.text.toString().trim()
             if (message.isNotEmpty()) {
-                viewModel.sendMessage(message,user.id, TYPE_TEXT){
+                viewModel.sendMessage(message, user.id, TYPE_TEXT) {
                     binding.chatInputMessage.setText("")
                 }
             }
@@ -247,8 +234,6 @@ class SingleChatFragment : Fragment() {
             findNavController().popBackStack()
         }
     }
-
-
 
     private fun attach() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -296,73 +281,6 @@ class SingleChatFragment : Fragment() {
 
     }
 
-
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-    private fun sendMessage(
-        message: String,
-        receivingUserId: String,
-        messageType: String,
-        function: () -> Unit
-    ) {
-        val refDialogUser = "$NODE_MESSAGES/$UID/$receivingUserId"
-        val refDialogReceivingUser = "$NODE_MESSAGES/$receivingUserId/$UID"
-        val messageKey = REF_DATABASE_ROOT.child(refDialogUser).push().key
-
-        val mapMessage = hashMapOf<String, Any>()
-        mapMessage[CHILD_FROM] = UID
-        mapMessage[CHILD_TEXT] = message
-        mapMessage[CHILD_ID] = messageKey.toString()
-        mapMessage[CHILD_TIMESTAMP] = ServerValue.TIMESTAMP
-        mapMessage[CHILD_TYPE] = messageType
-
-        val mapDialog = hashMapOf<String, Any>()
-        mapDialog["$refDialogUser/$messageKey"] = mapMessage
-        mapDialog["$refDialogReceivingUser/$messageKey"] = mapMessage
-
-        REF_DATABASE_ROOT
-            .updateChildren(mapDialog)
-            .addOnSuccessListener { function() }
-            .addOnFailureListener { showToast(it.message.toString()) }
-    }
-
-    private fun initReceiver(function: () -> Unit) {
-        getReceiverId {
-            getReceiver() { snapshot ->
-                receiver = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
-                function()
-            }
-        }
-    }
-
-    private fun getReceiver(function: (snapshot: DataSnapshot) -> Unit) {
-        REF_DATABASE_ROOT.child(NODE_USERS).child(user.id)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    function(snapshot)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                }
-
-            })
-    }
-
-    private fun getReceiverId(function: (snapshot: DataSnapshot) -> Unit) {
-        REF_DATABASE_ROOT.child(NODE_USERS_ID).child(user.id)
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    function(snapshot)
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                }
-            })
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (data == null) {
@@ -371,10 +289,11 @@ class SingleChatFragment : Fragment() {
         when (requestCode) {
             CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE -> {
                 val uri = CropImage.getActivityResult(data).uri
+                viewModel.insertImageUseCase(uri)
                 val messageKey =
                     REF_DATABASE_ROOT.child(NODE_MESSAGES).child(UID).child(user.id)
                         .push().key.toString()
-                uploadFileToStorage(uri, messageKey, user.id, TYPE_IMAGE)
+                viewModel.uploadFileUseCase(uri, messageKey, user.id, TYPE_IMAGE)
                 isNeedSmoothScroll = true
             }
             REQUEST_CODE -> {
@@ -384,7 +303,7 @@ class SingleChatFragment : Fragment() {
                         .push().key.toString()
                 uri?.let {
                     val filename = getFilenameFromUri(uri)
-                    uploadFileToStorage(uri, messageKey, user.id, TYPE_FILE, filename)
+                    viewModel.uploadFileUseCase(uri, messageKey, user.id, TYPE_FILE, filename)
                 }
                 isNeedSmoothScroll = true
             }
@@ -407,15 +326,6 @@ class SingleChatFragment : Fragment() {
             return filename
         }
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()

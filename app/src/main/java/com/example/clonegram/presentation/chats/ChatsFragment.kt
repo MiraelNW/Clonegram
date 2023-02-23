@@ -71,6 +71,9 @@ class ChatsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this,factory)[ChatsViewModel::class.java]
+        binding.fabCreateNewChat.setOnClickListener {
+            findNavController().navigate(R.id.action_chatsFragment_to_contactsFragment)
+        }
         startLocationPermissionRequest()
         UserState.updateState(UserState.ONLINE)
         createMenu()

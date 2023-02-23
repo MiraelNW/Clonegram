@@ -169,6 +169,40 @@ fun putFileToStorage(uri: Uri, path: StorageReference, function: () -> Unit) {
         .addOnFailureListener { showToast(it.message.toString()) }
 }
 
+fun initFirebaseReceiver(userId:String,function: (UserInfo) -> Unit) {
+    getReceiverId(userId) {
+        getReceiver(userId) { snapshot ->
+            val receiver = snapshot.getValue(UserInfo::class.java) ?: UserInfo()
+            function(receiver)
+        }
+    }
+}
+
+private fun getReceiver(userId:String,function: (snapshot: DataSnapshot) -> Unit) {
+    REF_DATABASE_ROOT.child(NODE_USERS).child(userId)
+        .addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                function(snapshot)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+
+        })
+}
+
+private fun getReceiverId(userId:String,function: (snapshot: DataSnapshot) -> Unit) {
+    REF_DATABASE_ROOT.child(NODE_USERS_ID).child(userId)
+        .addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                function(snapshot)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
+}
+
 private fun sendFileMessage(
     receivingUserId: String,
     fileUrl: String,
@@ -214,12 +248,10 @@ fun uploadFileToStorage(
 
 fun getFileFromStorage(file: File, fileUrl: String, function: () -> Unit) {
     val path = REF_STORAGE_ROOT.storage.getReferenceFromUrl(fileUrl)
-    Log.d("path", path.toString())
     path.getFile(file)
         .addOnSuccessListener { function() }
         .addOnFailureListener {
             showToast(it.message.toString())
-            Log.d("path", it.message.toString())
         }
 }
 

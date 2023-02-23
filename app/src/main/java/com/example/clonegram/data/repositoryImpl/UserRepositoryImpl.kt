@@ -49,6 +49,20 @@ class UserRepositoryImpl @Inject constructor(
        initFirebaseUser(function)
     }
 
+    override fun initReceiver(userId:String,function: (UserInfo) -> Unit) {
+       initFirebaseReceiver(userId, function)
+    }
+
+    override fun uploadFile(
+        uri: Uri,
+        messageKey: String,
+        receivedId: String,
+        typeMessage: String,
+        filename: String
+    ) {
+        uploadFileToStorage(uri, messageKey, receivedId, typeMessage, filename)
+    }
+
     override fun updateChildren(commonMap: HashMap<String, Any>,function: () -> Unit) {
         updateFirebaseChildren(commonMap,function)
     }
